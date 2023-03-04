@@ -1,0 +1,6 @@
+name: LibertyCity
+version: '${project.version}'
+main: com.xiii.libertycity.LibertyCity
+prefix: LibertyCity
+authors: [ XIII___ ]
+description: Plugin de  LibertyCity.
