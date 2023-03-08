@@ -1,4 +1,4 @@
-package com.xiii.libertycity.utils;
+package com.xiii.libertycity.core.utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
