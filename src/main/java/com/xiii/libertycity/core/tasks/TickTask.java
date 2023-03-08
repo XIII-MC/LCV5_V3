@@ -1,7 +1,7 @@
-package com.xiii.libertycity.tasks;
+package com.xiii.libertycity.core.tasks;
 
 import com.xiii.libertycity.LibertyCity;
-import com.xiii.libertycity.utils.MathUtils;
+import com.xiii.libertycity.core.utils.MathUtils;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TickTask extends BukkitRunnable {

@@ -1,4 +1,4 @@
-package com.xiii.libertycity.utils;
+package com.xiii.libertycity.core.utils;
 
 import com.xiii.libertycity.LibertyCity;
 import org.bukkit.Bukkit;
