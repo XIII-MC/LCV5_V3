@@ -1,4 +1,4 @@
-package com.xiii.libertycity.manager.threads;
+package com.xiii.libertycity.core.manager.threads;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

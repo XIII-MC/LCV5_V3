@@ -1,10 +1,11 @@
-package com.xiii.libertycity.manager.threads;
+package com.xiii.libertycity.core.manager.threads;
 
 import com.xiii.libertycity.LibertyCity;
-import com.xiii.libertycity.manager.Initializer;
-import com.xiii.libertycity.manager.profile.Profile;
-import com.xiii.libertycity.utils.MathUtils;
+import com.xiii.libertycity.core.manager.Initializer;
+import com.xiii.libertycity.core.manager.profile.Profile;
+import com.xiii.libertycity.core.utils.MathUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,7 +18,6 @@ import java.util.logging.Level;
 
 public class ThreadManager implements Listener, Initializer {
 
-    //Get a proper thread limit
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
     private final List<ProfileThread> profileThreads = new ArrayList<>();
@@ -59,14 +59,13 @@ public class ThreadManager implements Listener, Initializer {
         return profileThread.incrementAndGet();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onQuit(PlayerQuitEvent e) {
+    public void removeProfile(Player p) {
 
-        Profile profile = this.plugin.getProfileManager().getProfile(e.getPlayer());
+        final Profile profile = this.plugin.getProfileManager().getProfile(p);
 
         if (profile == null) return;
 
-        ProfileThread profileThread = profile.getProfileThread();
+        final ProfileThread profileThread = profile.getProfileThread();
 
         if (profileThread.getProfileCount() > 1) {
 
