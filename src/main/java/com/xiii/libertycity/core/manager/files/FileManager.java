@@ -1,7 +1,7 @@
-package com.xiii.libertycity.manager.files;
+package com.xiii.libertycity.core.manager.files;
 
 import com.xiii.libertycity.LibertyCity;
-import com.xiii.libertycity.manager.profile.Profile;
+import com.xiii.libertycity.core.manager.profile.Profile;
 import org.bukkit.entity.Player;
 
 import java.io.*;
@@ -48,9 +48,15 @@ public class FileManager {
             in.close();
             fileIn.close();
 
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException ignored) {
 
-            e.printStackTrace();
         }
+    }
+
+    public static boolean profileExists(Player player) {
+
+        File profileFile = new File(LibertyCity.getInstance().getDataFolder() + "/players/", player.getUniqueId() + ".ASCII");
+
+        return profileFile.exists();
     }
 }
