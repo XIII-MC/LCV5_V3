@@ -1,6 +1,6 @@
-package com.xiii.libertycity.manager.profile;
+package com.xiii.libertycity.core.manager.profile;
 
-import com.xiii.libertycity.manager.Initializer;
+import com.xiii.libertycity.core.manager.Initializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

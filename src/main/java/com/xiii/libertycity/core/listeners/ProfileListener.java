@@ -1,7 +1,8 @@
-package com.xiii.libertycity.listeners;
+package com.xiii.libertycity.core.listeners;
 
 import com.xiii.libertycity.LibertyCity;
-import com.xiii.libertycity.manager.files.FileManager;
+import com.xiii.libertycity.core.manager.files.FileManager;
+import com.xiii.libertycity.core.manager.profile.Profile;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,18 +23,27 @@ public class ProfileListener implements Listener {
 
         final Player player = e.getPlayer();
 
-        FileManager.readProfile(player);
+        if (FileManager.profileExists(player)) {
+
+            FileManager.readProfile(player);
+
+            final Profile profile = this.plugin.getProfileManager().getProfile(player);
+
+            profile.initialize(player);
+        }
 
         this.plugin.getProfileManager().createProfile(player);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLeave(PlayerQuitEvent e) {
 
         final Player player = e.getPlayer();
 
-        FileManager.saveProfile(this.plugin.getProfileManager().getProfile(player));
+        final Profile profile = this.plugin.getProfileManager().getProfile(player);
 
-        this.plugin.getProfileManager().removeProfile(player);
+        profile.getProfileThread().execute(() -> FileManager.saveProfile(profile));
+
+        this.plugin.getThreadManager().removeProfile(player);
     }
 }

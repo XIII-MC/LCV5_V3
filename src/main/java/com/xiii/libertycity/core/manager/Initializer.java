@@ -1,4 +1,4 @@
-package com.xiii.libertycity.manager;
+package com.xiii.libertycity.core.manager;
 
 public interface Initializer {
     void initialize();
