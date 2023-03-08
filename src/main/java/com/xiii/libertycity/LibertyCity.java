@@ -1,11 +1,15 @@
 package com.xiii.libertycity;
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.keenant.tabbed.Tabbed;
-import com.xiii.libertycity.listeners.ProfileListener;
-import com.xiii.libertycity.manager.files.FileManager;
-import com.xiii.libertycity.manager.profile.ProfileManager;
-import com.xiii.libertycity.manager.threads.ThreadManager;
-import com.xiii.libertycity.tasks.TickTask;
+import com.xiii.libertycity.core.listeners.ProfileListener;
+import com.xiii.libertycity.core.manager.files.FileManager;
+import com.xiii.libertycity.core.manager.profile.ProfileManager;
+import com.xiii.libertycity.core.manager.threads.ThreadManager;
+import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
+import com.xiii.libertycity.core.processors.network.NetworkListener;
+import com.xiii.libertycity.core.tasks.TickTask;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -18,10 +22,14 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class LibertyCity extends JavaPlugin {
+
+    // DEV: MTA2NTMxNDQ1NDk4NTc4NTQxNg.GJBEwB.YfdVOSjaLbwFQ3FN2Q3_B07xKaR52K_98JRftM
+    // OFI: MTA2Mjc5Mjg2ODk2NTY2MjcyMA.G8-6hq.7UHoeLfkMn6K04KuqDX7IXFKsUe28gPCGOeSBI
 
     //Internals
     public static LibertyCity instance;
@@ -32,9 +40,19 @@ public final class LibertyCity extends JavaPlugin {
 
     //Non Internals
     private BossBar bossBar;
-    private String botToken = "";
     private JDA jda;
     private Tabbed tab;
+
+    //PacketEvents
+    @Override
+    public void onLoad() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        //Are all listeners read only?
+        PacketEvents.getAPI().getSettings().readOnlyListeners(true)
+                .checkForUpdates(false)
+                .bStats(false);
+        PacketEvents.getAPI().load();
+    }
 
     @Override
     public void onEnable() {
@@ -43,15 +61,15 @@ public final class LibertyCity extends JavaPlugin {
         instance = this;
         (this.profileManager = new ProfileManager()).initialize();
         (this.threadManager = new ThreadManager(this)).initialize();
-        logger = Bukkit.getLogger();
+        logger = this.getLogger();
         pdf = this.getDescription();
-        // .addEventListeners(new SlashCommand())
-        jda = JDABuilder.createDefault(botToken).setActivity(Activity.watching("??? joueurs")).build();
-        tab = new Tabbed(this);
 
         //Init Non Internals
         log(Level.INFO, "Initialization...");
         bossBar = Bukkit.createBossBar("§k", BarColor.WHITE, BarStyle.SEGMENTED_6);
+        // .addEventListeners(new SlashCommand())
+        jda = JDABuilder.createDefault("MTA2NTMxNDQ1NDk4NTc4NTQxNg.GJBEwB.YfdVOSjaLbwFQ3FN2Q3_B07xKaR52K_98JRftM").setActivity(Activity.playing("RUNNING DEVMODE")).build();
+        tab = new Tabbed(this);
 
         //Startup
         log(Level.INFO, "Startup...");
@@ -62,10 +80,18 @@ public final class LibertyCity extends JavaPlugin {
 
         //Bukkit Listeners
         log(Level.INFO, "Starting listeners...");
+
+        //Packet Listeners
+        Collections.singletonList(
+                new NetworkListener(this)
+        ).forEach(packetListener -> PacketEvents.getAPI().getEventManager().registerListener(packetListener));
+
+        PacketEvents.getAPI().init();
+
+        //Bukkit Listeners
         Arrays.asList(
                 new ProfileListener(this),
-                //new ViolationListener(this),
-                new ThreadManager(this)
+                new BukkitListener(this)
         ).forEach(listener -> getServer().getPluginManager().registerEvents(listener, this));
 
         //Done
