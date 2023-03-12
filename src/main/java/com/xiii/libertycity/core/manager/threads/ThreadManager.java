@@ -5,15 +5,12 @@ import com.xiii.libertycity.core.manager.Initializer;
 import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.utils.MathUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class ThreadManager implements Listener, Initializer {
@@ -59,9 +56,9 @@ public class ThreadManager implements Listener, Initializer {
         return profileThread.incrementAndGet();
     }
 
-    public void removeProfile(Player p) {
+    public void removeProfile(UUID uuid) {
 
-        final Profile profile = this.plugin.getProfileManager().getProfile(p);
+        final Profile profile = this.plugin.getProfileManager().getProfile(uuid);
 
         if (profile == null) return;
 

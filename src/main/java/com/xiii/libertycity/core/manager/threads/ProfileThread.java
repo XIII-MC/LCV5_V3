@@ -13,7 +13,7 @@ public class ProfileThread {
 
         if (this.thread.isShutdown()) return;
 
-        this.thread.execute(runnable);
+        this.thread.submit(runnable);
     }
 
     public int getProfileCount() {
