@@ -13,7 +13,6 @@ import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.processors.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.TaskUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.logging.Level;
@@ -49,12 +48,12 @@ public class NetworkListener extends SimplePacketListenerAbstract {
             return;
         }
 
-        final Profile profile = this.plugin.getProfileManager().getProfile(player);
+        final Profile profile = this.plugin.getProfileManager().getProfile(player.getUniqueId());
 
-        if (profile == null) return;
+        if (profile == null || profile.playerEntity == null) return;
 
         profile.handleClientNetty(packet);
-        //profile.getProfileThread().execute(() -> profile.handleClient(packet));
+        profile.getProfileThread().execute(() -> profile.handleClient(packet));
     }
 
     @Override
@@ -65,12 +64,12 @@ public class NetworkListener extends SimplePacketListenerAbstract {
 
         final Player player = (Player) e.getPlayer();
 
-        final Profile profile = this.plugin.getProfileManager().getProfile(player);
+        final Profile profile = this.plugin.getProfileManager().getProfile(player.getUniqueId());
 
-        if (profile == null) return;
+        if (profile == null || profile.playerEntity == null) return;
 
         profile.handleServerNetty(packet);
-        //profile.getProfileThread().execute(() -> profile.handleServer(packet));
+        profile.getProfileThread().execute(() -> profile.handleServer(packet));
     }
 
     private boolean checkCrasher(ClientPlayPacket packet) {
