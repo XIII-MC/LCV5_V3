@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.keenant.tabbed.Tabbed;
 import com.xiii.libertycity.core.listeners.ProfileListener;
 import com.xiii.libertycity.core.manager.files.FileManager;
+import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.manager.profile.ProfileManager;
 import com.xiii.libertycity.core.manager.threads.ThreadManager;
 import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
@@ -11,8 +12,6 @@ import com.xiii.libertycity.core.processors.network.NetworkListener;
 import com.xiii.libertycity.core.tasks.TickTask;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -23,6 +22,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +39,8 @@ public final class LibertyCity extends JavaPlugin {
     private ThreadManager threadManager;
     private static Logger logger;
     private PluginDescriptionFile pdf;
+    private final ExecutorService thread = Executors.newSingleThreadExecutor();
+    private final UUID serverProfile = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     //Non Internals
     private BossBar bossBar;
@@ -48,7 +52,7 @@ public final class LibertyCity extends JavaPlugin {
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         //Are all listeners read only?
-        PacketEvents.getAPI().getSettings().readOnlyListeners(true)
+        PacketEvents.getAPI().getSettings().readOnlyListeners(false)
                 .checkForUpdates(false)
                 .bStats(false);
         PacketEvents.getAPI().load();
@@ -66,10 +70,12 @@ public final class LibertyCity extends JavaPlugin {
 
         //Init Non Internals
         log(Level.INFO, "Initialization...");
-        bossBar = Bukkit.createBossBar("§k", BarColor.WHITE, BarStyle.SEGMENTED_6);
-        // .addEventListeners(new SlashCommand())
-        jda = JDABuilder.createDefault("MTA2NTMxNDQ1NDk4NTc4NTQxNg.GJBEwB.YfdVOSjaLbwFQ3FN2Q3_B07xKaR52K_98JRftM").setActivity(Activity.playing("RUNNING DEVMODE")).build();
-        tab = new Tabbed(this);
+        this.thread.submit(() -> {
+            bossBar = Bukkit.createBossBar("§k", BarColor.WHITE, BarStyle.SEGMENTED_6);
+            // .addEventListeners(new SlashCommand())
+            //jda = JDABuilder.createDefault("MTA2NTMxNDQ1NDk4NTc4NTQxNg.GJBEwB.YfdVOSjaLbwFQ3FN2Q3_B07xKaR52K_98JRftM").setActivity(Activity.playing("RUNNING DEVMODE")).build();
+            tab = new Tabbed(this);
+        });
 
         //Startup
         log(Level.INFO, "Startup...");
@@ -96,17 +102,40 @@ public final class LibertyCity extends JavaPlugin {
 
         //Done
         log(Level.INFO, "Plugin loaded and ready.");
+
+        //Debug
+        log(Level.WARNING, "Debugging... (async)");
+        this.getThread().submit(() -> {
+            if (FileManager.profileExists(this.getServerUUID())) {
+
+                FileManager.readProfile(this.getServerUUID());
+                log(Level.WARNING, "Read ServerProfile from file.");
+            }
+            this.getProfileManager().createProfile(this.getServerUUID());
+            log(Level.WARNING, "Profile created.");
+            this.getServerProfile().isVerified = true;
+            log(Level.WARNING, "Wrote 'isVerified = true' into ServerProfile.");
+            FileManager.saveProfile(this.getServerProfile());
+            log(Level.WARNING, "Profile saved.");
+            log(Level.WARNING, "Read ServerProfile value 'rpAge' returned " + this.getServerProfile().rpAge);
+            log(Level.WARNING, "Debug ended.");
+        });
     }
 
     @Override
     public void onDisable() {
 
         //Save all data to prevent data loss
-        for(Player p : Bukkit.getOnlinePlayers()) FileManager.saveProfile(this.getProfileManager().getProfile(p));
+        for(Player p : Bukkit.getOnlinePlayers()) FileManager.saveProfile(this.getProfileManager().getProfile(p.getUniqueId()));
+        //Save ServerProfile data
+        FileManager.saveProfile(this.getServerProfile());
 
         //Shutdown all managers
         this.profileManager.shutdown();
         this.threadManager.shutdown();
+
+        //Shutdown thread
+        this.thread.shutdownNow();
 
         //Cancel all tasks
         Bukkit.getScheduler().cancelTasks(this);
@@ -145,5 +174,17 @@ public final class LibertyCity extends JavaPlugin {
 
     public BossBar getBossBar() {
         return bossBar;
+    }
+
+    public ExecutorService getThread() {
+        return thread;
+    }
+
+    public UUID getServerUUID() {
+        return serverProfile;
+    }
+
+    public Profile getServerProfile() {
+        return this.getProfileManager().getProfile(this.getServerUUID());
     }
 }

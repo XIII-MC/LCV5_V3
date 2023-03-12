@@ -30,12 +30,19 @@ public class ProfileManager implements Initializer {
         this.profiles.put(uuid, new Profile(player));
     }
 
-    public void removeProfile(Player player) {
-        this.profiles.remove(player.getUniqueId());
+    public void createProfile(UUID uuid) {
+
+        if (this.profiles.containsKey(uuid)) return;
+
+        this.profiles.put(uuid, new Profile(uuid));
     }
 
-    public Profile getProfile(Player player) {
-        return this.profiles.get(player.getUniqueId());
+    public void removeProfile(UUID uuid) {
+        this.profiles.remove(uuid);
+    }
+
+    public Profile getProfile(UUID uuid) {
+        return this.profiles.get(uuid);
     }
 
     public Map<UUID, Profile> getProfileMap() {
