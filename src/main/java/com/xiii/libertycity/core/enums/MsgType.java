@@ -3,6 +3,11 @@ package com.xiii.libertycity.core.enums;
 public enum MsgType {
     PREFIX("§2§lLiberty§a§lCity §7»§f "),
     MAIRIE("§6§lMairie §7»§f "),
+    HRP("§3§lHRP §8| "),
+    RP("§2§LRP §8|"),
+    POLICE("§b§lPOLICE §8| "),
+    GANG("§4§lGANG §8| "),
+    STAFF("§4§lSTAFF §8| "),
     MICHEL_FULL("§e§l[NPC]§r§e Michel: §r"),
     STEVE_FIRST("§e§l[NPC]§r§e Steve §kRowland§r§e: §r"),
     STEVE_FULL("§e§l[NPC]§r§e Steve Rowland: §r"),
