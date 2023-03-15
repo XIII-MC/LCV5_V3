@@ -8,6 +8,8 @@ import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.processors.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.ChatUtils;
+import com.xiii.libertycity.core.utils.time.TimeFormat;
+import com.xiii.libertycity.core.utils.time.TimeUtils;
 import com.xiii.libertycity.roleplay.events.Data;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -125,6 +127,7 @@ public class RegisterEvent implements Data {
                     profile.isVerified = true;
                     profile.rpChat = 0;
                     profile.rpBankBalance = 0;
+                    profile.joinDate = TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.FULL);
                     //give player 20$ bill
                     player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 1));
                     //give player ID card
