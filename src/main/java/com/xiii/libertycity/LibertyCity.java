@@ -10,18 +10,23 @@ import com.xiii.libertycity.core.manager.threads.ThreadManager;
 import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
 import com.xiii.libertycity.core.processors.network.NetworkListener;
 import com.xiii.libertycity.core.tasks.TickTask;
+import com.xiii.libertycity.core.tasks.YAMLSaveTask;
+import com.xiii.libertycity.core.utils.time.TimeFormat;
+import com.xiii.libertycity.core.utils.time.TimeUtils;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,14 +73,16 @@ public final class LibertyCity extends JavaPlugin {
         logger = this.getLogger();
         pdf = this.getDescription();
 
+        if (FileManager.profileExists(this.getServerUUID())) FileManager.readProfile(this.getServerUUID());
+        this.getProfileManager().createProfile(this.getServerUUID());
+        this.getServerProfile().isVerified = true;
+
         //Init Non Internals
         log(Level.INFO, "Initialization...");
-        this.thread.submit(() -> {
-            bossBar = Bukkit.createBossBar("§k", BarColor.WHITE, BarStyle.SEGMENTED_6);
-            // .addEventListeners(new SlashCommand())
-            //jda = JDABuilder.createDefault("MTA2NTMxNDQ1NDk4NTc4NTQxNg.GJBEwB.YfdVOSjaLbwFQ3FN2Q3_B07xKaR52K_98JRftM").setActivity(Activity.playing("RUNNING DEVMODE")).build();
-            tab = new Tabbed(this);
-        });
+        bossBar = Bukkit.createBossBar("§k", BarColor.WHITE, BarStyle.SEGMENTED_6);
+        // .addEventListeners(new SlashCommand())
+        //jda = JDABuilder.createDefault("MTA2NTMxNDQ1NDk4NTc4NTQxNg.GJBEwB.YfdVOSjaLbwFQ3FN2Q3_B07xKaR52K_98JRftM").setActivity(Activity.playing("RUNNING DEVMODE")).build();
+        tab = new Tabbed(this);
 
         //Startup
         log(Level.INFO, "Startup...");
@@ -83,6 +90,7 @@ public final class LibertyCity extends JavaPlugin {
         //Tasks
         log(Level.INFO, "Starting tasks...");
         new TickTask(this).runTaskTimerAsynchronously(this, 50L, 0L);
+        new YAMLSaveTask(this).runTaskTimerAsynchronously(this, 20*60L, 0L);
 
         //Bukkit Listeners
         log(Level.INFO, "Starting listeners...");
@@ -100,35 +108,37 @@ public final class LibertyCity extends JavaPlugin {
                 new BukkitListener(this)
         ).forEach(listener -> getServer().getPluginManager().registerEvents(listener, this));
 
+        //ZIP log files
+        log(Level.INFO, "Zipping log files...");
+
+        final File fileFolder = new File(LibertyCity.getInstance().getDataFolder() + "/logs/");
+
+        if (!fileFolder.exists()) fileFolder.mkdir();
+
+        final File compare = new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG_DATE) + ".log");
+
+        for (final File file : Objects.requireNonNull(fileFolder.listFiles())) {
+
+            if (!file.getName().equals(compare.getName()) && !file.getName().contains(".zip")) FileManager.zipFile(file, new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + file.getName().replace(".log", "") + ".zip"));
+        }
+
         //Done
         log(Level.INFO, "Plugin loaded and ready.");
-
-        //Debug
-        log(Level.WARNING, "Debugging... (async)");
-        this.getThread().submit(() -> {
-            if (FileManager.profileExists(this.getServerUUID())) {
-
-                FileManager.readProfile(this.getServerUUID());
-                log(Level.WARNING, "Read ServerProfile from file.");
-            }
-            this.getProfileManager().createProfile(this.getServerUUID());
-            log(Level.WARNING, "Profile created.");
-            this.getServerProfile().isVerified = true;
-            log(Level.WARNING, "Wrote 'isVerified = true' into ServerProfile.");
-            FileManager.saveProfile(this.getServerProfile());
-            log(Level.WARNING, "Profile saved.");
-            log(Level.WARNING, "Read ServerProfile value 'rpAge' returned " + this.getServerProfile().rpAge);
-            log(Level.WARNING, "Debug ended.");
-        });
     }
 
     @Override
     public void onDisable() {
 
         //Save all data to prevent data loss
-        for(Player p : Bukkit.getOnlinePlayers()) FileManager.saveProfile(this.getProfileManager().getProfile(p.getUniqueId()));
-        //Save ServerProfile data
+        Bukkit.getOnlinePlayers().forEach(player -> FileManager.saveProfile(this.getProfileManager().getProfile(player.getUniqueId())));
         FileManager.saveProfile(this.getServerProfile());
+
+        //Save chat logs
+        try {
+            FileManager.getYamlConfig().save(FileManager.getLogFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //Shutdown all managers
         this.profileManager.shutdown();
