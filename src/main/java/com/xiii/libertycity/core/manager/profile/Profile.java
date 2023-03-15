@@ -4,11 +4,10 @@ import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.manager.threads.ProfileThread;
 import com.xiii.libertycity.core.processors.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.ServerPlayPacket;
+import com.xiii.libertycity.roleplay.ChatSystem;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.sql.Date;
 import java.util.UUID;
 
 public class Profile implements java.io.Serializable{
@@ -21,14 +20,19 @@ public class Profile implements java.io.Serializable{
     private transient ProfileThread profileThread;
     //------------------------------------
     private transient RegisterEvent registerEvent;
+    private transient ChatSystem chatSystem;
     //------------------------------------
     public String rpFirstName;
     public String rpLastName;
     public int rpAge;
     public boolean isVerified;
     public long rpBankBalance;
-    public Date joinDate;
+    public String joinDate;
     public int rpChat; // 0=HRP 1=RP 2=POLICE 3=GANG 4=STAFF
+    public String policeRank;
+    public String gangName;
+    public transient boolean spyGlobal;
+    public transient int spyChat = -1; // 0=HRP 1=RP 2=POLICE 3=GANG
 
     public Profile(UUID uuid) {
         this.playerUUID = uuid;
@@ -41,6 +45,7 @@ public class Profile implements java.io.Serializable{
         this.profileThread = LibertyCity.getInstance().getThreadManager().getAvailableProfileThread();
 
         this.registerEvent = new RegisterEvent();
+        this.chatSystem = new ChatSystem();
     }
 
     public void initialize(Player player) {
@@ -49,11 +54,13 @@ public class Profile implements java.io.Serializable{
         this.profileThread = LibertyCity.getInstance().getThreadManager().getAvailableProfileThread();
 
         this.registerEvent = new RegisterEvent();
+        this.chatSystem = new ChatSystem();
     }
 
     public void handleClientNetty(ClientPlayPacket packet) {
 
         this.registerEvent.handle(packet);
+        this.chatSystem.handle(packet);
     }
 
     public void handleServerNetty(ServerPlayPacket packet) {
