@@ -11,6 +11,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
+
 public class ChatUtils {
 
     public static void broadcast(final String message) {
@@ -21,12 +23,7 @@ public class ChatUtils {
 
             final WrapperPlayServerChatMessage packet = new WrapperPlayServerChatMessage(chatMessage);
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-
-                final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
-
-                if (profile.isVerified) PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getProtocolManager().getChannel(player.getUniqueId()), packet);
-            }
+            Bukkit.getOnlinePlayers().stream().filter(player -> LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).isVerified).forEach(player -> PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getPlayerManager().getChannel(player), packet));
         });
     }
 
@@ -38,12 +35,19 @@ public class ChatUtils {
 
             final WrapperPlayServerChatMessage packet = new WrapperPlayServerChatMessage(chatMessage);
 
-            for (Player player : players) {
+            BetterStream.filter(players, player -> LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).isVerified).forEach(player -> PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getPlayerManager().getChannel(player), packet));
+        });
+    }
 
-                final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
+    public static void multicast(final String message, final Collection<Player> players) {
 
-                if (profile.isVerified) PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getProtocolManager().getChannel(player.getUniqueId()), packet);
-            }
+        LibertyCity.getInstance().getThread().submit(() -> {
+
+            final ChatMessage chatMessage = new ChatMessageLegacy(Component.text(message), ChatTypes.CHAT);
+
+            final WrapperPlayServerChatMessage packet = new WrapperPlayServerChatMessage(chatMessage);
+
+            BetterStream.filter(players, player -> LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).isVerified).forEach(player -> PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getPlayerManager().getChannel(player), packet));
         });
     }
 }
