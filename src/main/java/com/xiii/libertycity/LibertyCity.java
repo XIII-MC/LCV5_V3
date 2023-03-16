@@ -9,8 +9,8 @@ import com.xiii.libertycity.core.manager.profile.ProfileManager;
 import com.xiii.libertycity.core.manager.threads.ThreadManager;
 import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
 import com.xiii.libertycity.core.processors.network.NetworkListener;
+import com.xiii.libertycity.core.tasks.LogExportTask;
 import com.xiii.libertycity.core.tasks.TickTask;
-import com.xiii.libertycity.core.tasks.YAMLSaveTask;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -90,7 +90,7 @@ public final class LibertyCity extends JavaPlugin {
         //Tasks
         log(Level.INFO, "Starting tasks...");
         new TickTask(this).runTaskTimerAsynchronously(this, 50L, 0L);
-        new YAMLSaveTask(this).runTaskTimerAsynchronously(this, 20*60L, 0L);
+        new LogExportTask(this).runTaskTimerAsynchronously(this, 60000L, 0L);
 
         //Bukkit Listeners
         log(Level.INFO, "Starting listeners...");
@@ -133,9 +133,9 @@ public final class LibertyCity extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach(player -> FileManager.saveProfile(this.getProfileManager().getProfile(player.getUniqueId())));
         FileManager.saveProfile(this.getServerProfile());
 
-        //Save chat logs
+        //Save log file
         try {
-            FileManager.getYamlConfig().save(FileManager.getLogFile());
+            FileManager.getCfg().save(FileManager.getLogFile());
         } catch (IOException e) {
             e.printStackTrace();
         }

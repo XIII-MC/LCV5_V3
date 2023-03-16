@@ -2,7 +2,6 @@ package com.xiii.libertycity.core.manager.files;
 
 import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.manager.profile.Profile;
-import com.xiii.libertycity.core.utils.MathUtils;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,7 +17,7 @@ import java.util.zip.ZipOutputStream;
 public class FileManager {
 
     private static final String logDate = TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG_DATE);
-    private static final YamlConfiguration cfg = YamlConfiguration.loadConfiguration(new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + logDate + ".log"));
+    public static final YamlConfiguration cfg = YamlConfiguration.loadConfiguration(new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + logDate + ".log"));
 
     public static void saveProfile(Profile profile) {
         try {
@@ -131,11 +130,11 @@ public class FileManager {
         }
     }
 
-    public static YamlConfiguration getYamlConfig() {
-        return cfg;
-    }
-
     public static File getLogFile() {
         return new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + logDate + ".log");
+    }
+
+    public static YamlConfiguration getCfg() {
+        return cfg;
     }
 }

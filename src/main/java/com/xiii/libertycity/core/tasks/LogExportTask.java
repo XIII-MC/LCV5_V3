@@ -6,19 +6,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
 
-public class YAMLSaveTask extends BukkitRunnable {
+public class LogExportTask extends BukkitRunnable {
 
-    private final LibertyCity plugin;
+    private LibertyCity plugin;
 
-    public YAMLSaveTask(LibertyCity plugin) {
+    public LogExportTask(LibertyCity plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public void run() {
-
         try {
-            FileManager.getYamlConfig().save(FileManager.getLogFile());
+            FileManager.getCfg().save(FileManager.getLogFile());
         } catch (IOException e) {
             e.printStackTrace();
         }
