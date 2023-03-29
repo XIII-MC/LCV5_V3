@@ -2,6 +2,8 @@ package com.xiii.libertycity.core.enums;
 
 public enum MsgType {
     PREFIX("§2§lLiberty§a§lCity §7»§f "),
+    BANK("§2§lLiberty§6§LBank §7»§f "),
+    BANK_EXPRESS("§2§lLiberty§6§LBank§e§l§oEXPRESS §7»§f "),
     MAIRIE("§6§lMairie §7»§f "),
     HRP("§3§lHRP §8| "),
     RP("§2§LRP §8|"),

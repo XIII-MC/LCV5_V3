@@ -6,6 +6,7 @@ import com.xiii.libertycity.core.processors.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.ServerPlayPacket;
 import com.xiii.libertycity.roleplay.ChatSystem;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
+import com.xiii.libertycity.roleplay.guis.atm.GUI;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class Profile implements java.io.Serializable{
     //------------------------------------
     private transient RegisterEvent registerEvent;
     private transient ChatSystem chatSystem;
+    private transient GUI atmGUI;
     //------------------------------------
     public String rpFirstName;
     public String rpLastName;
@@ -40,12 +42,7 @@ public class Profile implements java.io.Serializable{
 
     public Profile(Player player) {
         this.playerUUID = player.getUniqueId();
-        this.playerName = player.getName();
-        this.playerEntity = player.getPlayer();
-        this.profileThread = LibertyCity.getInstance().getThreadManager().getAvailableProfileThread();
-
-        this.registerEvent = new RegisterEvent();
-        this.chatSystem = new ChatSystem();
+        initialize(player);
     }
 
     public void initialize(Player player) {
@@ -55,17 +52,18 @@ public class Profile implements java.io.Serializable{
 
         this.registerEvent = new RegisterEvent();
         this.chatSystem = new ChatSystem();
+        this.atmGUI = new GUI();
     }
 
     public void handleClientNetty(ClientPlayPacket packet) {
 
         this.registerEvent.handle(packet);
         this.chatSystem.handle(packet);
+        this.atmGUI.handle(packet);
     }
 
     public void handleServerNetty(ServerPlayPacket packet) {
-
-
+        this.atmGUI.handle(packet);
     }
 
     public void handleClient(ClientPlayPacket packet) {

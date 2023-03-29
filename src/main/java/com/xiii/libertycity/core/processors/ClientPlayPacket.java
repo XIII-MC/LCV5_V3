@@ -2,10 +2,7 @@ package com.xiii.libertycity.core.processors;
 
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerPosition;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerPositionAndRotation;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerRotation;
+import com.github.retrooper.packetevents.wrapper.play.client.*;
 import org.bukkit.entity.Player;
 
 public class ClientPlayPacket {
@@ -22,6 +19,16 @@ public class ClientPlayPacket {
     Chat - Messages/Commands cache
      */
     private WrapperPlayClientChatMessage chatWrapper;
+
+    /*
+    Blocks - Blocks cache
+     */
+    private WrapperPlayClientPlayerBlockPlacement blockPlacement;
+
+    /*
+    Inventories - Windows cache
+     */
+    private WrapperPlayClientClickWindow clickWindow;
 
     /*
     Movement - Flying cache
@@ -60,6 +67,18 @@ public class ClientPlayPacket {
                 this.chatWrapper = new WrapperPlayClientChatMessage(e);
 
                 break;
+
+            case PLAYER_BLOCK_PLACEMENT:
+
+                this.blockPlacement = new WrapperPlayClientPlayerBlockPlacement(e);
+
+                break;
+
+            case CLICK_WINDOW:
+
+                this.clickWindow = new WrapperPlayClientClickWindow(e);
+
+                break;
         }
 
     }
@@ -78,6 +97,14 @@ public class ClientPlayPacket {
 
     public WrapperPlayClientChatMessage getChatWrapper() {
         return chatWrapper;
+    }
+
+    public WrapperPlayClientPlayerBlockPlacement getBlocKPlacementWrapper() {
+        return blockPlacement;
+    }
+
+    public WrapperPlayClientClickWindow getClickWindow() {
+        return clickWindow;
     }
 
     public PacketType.Play.Client getType() {

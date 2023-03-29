@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
-public class ChatUtils {
+public final class ChatUtils {
 
     public static void broadcast(final String message) {
 
