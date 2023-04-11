@@ -19,7 +19,7 @@ public class ChatSystem implements Data {
 
     public void handle(ClientPlayPacket packet) {
 
-        if (packet.getType() == PacketType.Play.Client.CHAT_MESSAGE) {
+        if (packet.getType() == PacketType.Play.Client.CHAT_MESSAGE && !packet.getChatWrapper().getMessage().startsWith("/")) {
 
             packet.getEvent().setCancelled(true);
 
