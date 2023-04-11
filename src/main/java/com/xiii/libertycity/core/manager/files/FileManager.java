@@ -120,8 +120,10 @@ public class FileManager {
 
             LibertyCity.log(Level.WARNING, "Zipped file " + pathIn);
 
+            zipOut.flush();
             zipOut.close();
             fis.close();
+            fos.flush();
             fos.close();
             pathIn.delete();
         } catch (final IOException e) {
