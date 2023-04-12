@@ -28,13 +28,22 @@ public class Profile implements java.io.Serializable{
     public String rpLastName;
     public int rpAge;
     public boolean isVerified;
-    public long rpBankBalance;
     public String joinDate;
     public int rpChat; // 0=HRP 1=RP 2=POLICE 3=GANG 4=STAFF
     public String policeRank;
     public String gangName;
-    public transient boolean spyGlobal;
+    public transient boolean spyGlobal = false;
     public transient int spyChat = -1; // 0=HRP 1=RP 2=POLICE 3=GANG
+
+    //Bank
+    public long rpBankBalance = 0;
+    public int rpBankType = 0;
+    public long rpBankMaxDep = 1500;
+    public long rpBankMaxWit = 600;
+    public long rpBankMaxBalance = 10000;
+    public long rpBankMinBalance = -50;
+    public long rpBankCurrDep = 0;
+    public long rpBankCurrWit = 0;
 
     public Profile(UUID uuid) {
         this.playerUUID = uuid;
@@ -63,6 +72,9 @@ public class Profile implements java.io.Serializable{
     }
 
     public void handleServerNetty(ServerPlayPacket packet) {
+
+        if (this.atmGUI == null) return;
+
         this.atmGUI.handle(packet);
     }
 
