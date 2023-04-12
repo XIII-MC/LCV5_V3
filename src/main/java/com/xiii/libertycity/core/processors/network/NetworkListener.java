@@ -66,7 +66,7 @@ public class NetworkListener extends SimplePacketListenerAbstract {
 
         final Profile profile = this.plugin.getProfileManager().getProfile(player.getUniqueId());
 
-        if (profile == null || profile.playerEntity == null) return;
+        if (profile == null || profile.playerEntity == null || profile.getProfileThread() == null) return;
 
         profile.handleServerNetty(packet);
         profile.getProfileThread().execute(() -> profile.handleServer(packet));
