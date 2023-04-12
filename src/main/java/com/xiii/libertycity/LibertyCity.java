@@ -13,7 +13,6 @@ import com.xiii.libertycity.core.tasks.LogExportTask;
 import com.xiii.libertycity.core.tasks.TickTask;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
-import com.xiii.libertycity.roleplay.guis.atm.GUI;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
@@ -51,15 +50,12 @@ public final class LibertyCity extends JavaPlugin {
     private BossBar bossBar;
     //private JDA jda;
     private Tabbed tab;
-    private final GUI atm = new GUI();
 
     //PacketEvents
     @Override
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-        //Are all listeners read only?
-        PacketEvents.getAPI().getSettings().readOnlyListeners(false)
-                .checkForUpdates(false)
+        PacketEvents.getAPI().getSettings().checkForUpdates(false)
                 .bStats(false);
         PacketEvents.getAPI().load();
     }
@@ -84,7 +80,6 @@ public final class LibertyCity extends JavaPlugin {
         // .addEventListeners(new SlashCommand())
         //jda = JDABuilder.createDefault("MTA2NTMxNDQ1NDk4NTc4NTQxNg.GJBEwB.YfdVOSjaLbwFQ3FN2Q3_B07xKaR52K_98JRftM").setActivity(Activity.playing("RUNNING DEVMODE")).build();
         tab = new Tabbed(this);
-        atm.initialize();
 
         //Startup
         log(Level.INFO, "Startup...");
