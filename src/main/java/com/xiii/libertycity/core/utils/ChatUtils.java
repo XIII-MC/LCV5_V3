@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.xiii.libertycity.LibertyCity;
-import com.xiii.libertycity.core.manager.profile.Profile;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -29,6 +28,8 @@ public final class ChatUtils {
 
     public static void multicast(final String message, final Player... players) {
 
+        if (players == null) return;
+
         LibertyCity.getInstance().getThread().submit(() -> {
 
             final ChatMessage chatMessage = new ChatMessageLegacy(Component.text(message), ChatTypes.CHAT);
@@ -40,6 +41,8 @@ public final class ChatUtils {
     }
 
     public static void multicast(final String message, final Collection<Player> players) {
+
+        if (players == null || players.isEmpty()) return;
 
         LibertyCity.getInstance().getThread().submit(() -> {
 
