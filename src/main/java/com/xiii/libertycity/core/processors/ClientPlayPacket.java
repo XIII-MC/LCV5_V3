@@ -31,6 +31,11 @@ public class ClientPlayPacket {
     private WrapperPlayClientClickWindow clickWindow;
 
     /*
+    Items - Items cache
+     */
+    private WrapperPlayClientUseItem useItem;
+
+    /*
     Movement - Flying cache
     */
     private WrapperPlayClientPlayerPosition positionWrapper;
@@ -79,6 +84,12 @@ public class ClientPlayPacket {
                 this.clickWindow = new WrapperPlayClientClickWindow(e);
 
                 break;
+
+            case USE_ITEM:
+
+                this.useItem = new WrapperPlayClientUseItem(e);
+
+                break;
         }
 
     }
@@ -99,12 +110,16 @@ public class ClientPlayPacket {
         return chatWrapper;
     }
 
-    public WrapperPlayClientPlayerBlockPlacement getBlocKPlacementWrapper() {
+    public WrapperPlayClientPlayerBlockPlacement getBlockPlacementWrapper() {
         return blockPlacement;
     }
 
     public WrapperPlayClientClickWindow getClickWindow() {
         return clickWindow;
+    }
+
+    public WrapperPlayClientUseItem getUseItem() {
+        return useItem;
     }
 
     public PacketType.Play.Client getType() {
