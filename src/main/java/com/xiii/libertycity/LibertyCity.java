@@ -87,7 +87,7 @@ public final class LibertyCity extends JavaPlugin {
         //Tasks
         log(Level.INFO, "Starting tasks...");
         new TickTask(this).runTaskTimerAsynchronously(this, 50L, 0L);
-        new LogExportTask(this).runTaskTimerAsynchronously(this, 60000L, 0L);
+        new LogExportTask().runTaskTimerAsynchronously(this, 20*10, 0L);
 
         //Bukkit Listeners
         log(Level.INFO, "Starting listeners...");
