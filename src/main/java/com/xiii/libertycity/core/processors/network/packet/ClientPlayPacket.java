@@ -36,6 +36,11 @@ public class ClientPlayPacket {
     private WrapperPlayClientUseItem useItem;
 
     /*
+    Interactions - Interact entity cache
+     */
+    private WrapperPlayClientInteractEntity interactEntity;
+
+    /*
     Movement - Flying cache
     */
     private WrapperPlayClientPlayerPosition positionWrapper;
@@ -90,6 +95,12 @@ public class ClientPlayPacket {
                 this.useItem = new WrapperPlayClientUseItem(e);
 
                 break;
+
+            case INTERACT_ENTITY:
+
+                this.interactEntity = new WrapperPlayClientInteractEntity(e);
+
+                break;
         }
 
     }
@@ -116,6 +127,10 @@ public class ClientPlayPacket {
 
     public WrapperPlayClientClickWindow getClickWindow() {
         return clickWindow;
+    }
+
+    public WrapperPlayClientInteractEntity getInteractEntity() {
+        return interactEntity;
     }
 
     public WrapperPlayClientUseItem getUseItem() {
