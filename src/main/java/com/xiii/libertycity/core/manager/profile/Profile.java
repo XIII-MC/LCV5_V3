@@ -8,6 +8,8 @@ import com.xiii.libertycity.roleplay.ChatSystem;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
 import com.xiii.libertycity.roleplay.guis.atm.events.network.ATMHandle;
 import com.xiii.libertycity.roleplay.guis.trashcan.events.network.TrashcanHandle;
+import com.xiii.libertycity.roleplay.items.handcuffs.events.network.HandcuffsHandle;
+import com.xiii.libertycity.roleplay.items.idcard.events.network.IDCardHandle;
 import com.xiii.libertycity.roleplay.items.wallet.events.network.WalletHandle;
 import org.bukkit.entity.Player;
 
@@ -32,6 +34,8 @@ public class Profile implements java.io.Serializable {
     private transient ATMHandle atmHandle;
     private transient TrashcanHandle trashcanGUI;
     private transient WalletHandle walletHandle;
+    private transient IDCardHandle idCardHandle;
+    private transient HandcuffsHandle handcuffsHandle;
     //------------------------------------
     public String rpFirstName;
     public String rpLastName;
@@ -43,6 +47,8 @@ public class Profile implements java.io.Serializable {
     public String gangName;
     public transient boolean spyGlobal = false;
     public transient int spyChat = -1; // 0=HRP 1=RP 2=POLICE 3=GANG
+    public String encryptedIDCardID;
+    public boolean isHandcuffed;
 
     //Bank
     public long rpBankBalance = 0;
@@ -53,6 +59,9 @@ public class Profile implements java.io.Serializable {
     public long rpBankMinBalance = -50;
     public long rpBankCurrDep = 0;
     public long rpBankCurrWit = 0;
+
+    //Temp
+    public transient Player handcuffedBy;
 
     public Profile(final UUID uuid) {
         this.playerUUID = uuid;
@@ -73,6 +82,8 @@ public class Profile implements java.io.Serializable {
         this.atmHandle = new ATMHandle();
         this.trashcanGUI = new TrashcanHandle();
         this.walletHandle = new WalletHandle();
+        this.idCardHandle = new IDCardHandle();
+        this.handcuffsHandle = new HandcuffsHandle();
     }
 
     public void serverInitialize() {
@@ -88,6 +99,8 @@ public class Profile implements java.io.Serializable {
         this.atmHandle.handle(packet);
         this.trashcanGUI.handle(packet);
         this.walletHandle.handle(packet);
+        this.idCardHandle.handle(packet);
+        this.handcuffsHandle.handle(packet);
     }
 
     public void handleServerNetty(final ServerPlayPacket packet) {
