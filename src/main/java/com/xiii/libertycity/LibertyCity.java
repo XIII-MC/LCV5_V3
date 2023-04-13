@@ -4,8 +4,8 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.keenant.tabbed.Tabbed;
 import com.xiii.libertycity.core.listeners.ProfileListener;
 import com.xiii.libertycity.core.manager.files.FileManager;
-import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.manager.profile.ProfileManager;
+import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.manager.threads.ThreadManager;
 import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
 import com.xiii.libertycity.core.processors.network.NetworkListener;
@@ -44,7 +44,7 @@ public final class LibertyCity extends JavaPlugin {
     private static Logger logger;
     private PluginDescriptionFile pdf;
     private final ExecutorService thread = Executors.newSingleThreadExecutor();
-    private final UUID serverProfile = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    private final UUID serverUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     //Non Internals
     private BossBar bossBar;
@@ -72,7 +72,7 @@ public final class LibertyCity extends JavaPlugin {
 
         if (FileManager.profileExists(this.getServerUUID())) FileManager.readProfile(this.getServerUUID());
         this.getProfileManager().createProfile(this.getServerUUID());
-        this.getServerProfile().isVerified = true;
+        this.getProfileManager().getProfile(this.getServerUUID()).serverInitialize();
 
         //Init Non Internals
         log(Level.INFO, "Initialization...");
@@ -188,7 +188,7 @@ public final class LibertyCity extends JavaPlugin {
     }
 
     public UUID getServerUUID() {
-        return serverProfile;
+        return serverUUID;
     }
 
     public Profile getServerProfile() {

@@ -21,27 +21,27 @@ public class ProfileManager implements Initializer {
                 .forEach(this::createProfile);
     }
 
-    public void createProfile(Player player) {
+    public void createProfile(final Player player) {
 
-        UUID uuid = player.getUniqueId();
+        final UUID uuid = player.getUniqueId();
 
         if (this.profiles.containsKey(uuid)) return;
 
         this.profiles.put(uuid, new Profile(player));
     }
 
-    public void createProfile(UUID uuid) {
+    public void createProfile(final UUID uuid) {
 
         if (this.profiles.containsKey(uuid)) return;
 
         this.profiles.put(uuid, new Profile(uuid));
     }
 
-    public void removeProfile(UUID uuid) {
+    public void removeProfile(final UUID uuid) {
         this.profiles.remove(uuid);
     }
 
-    public Profile getProfile(UUID uuid) {
+    public Profile getProfile(final UUID uuid) {
         return this.profiles.get(uuid);
     }
 
