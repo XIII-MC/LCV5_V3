@@ -5,8 +5,9 @@ import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.enums.MsgType;
 import com.xiii.libertycity.core.manager.files.FileManager;
 import com.xiii.libertycity.core.manager.profile.Profile;
-import com.xiii.libertycity.core.processors.ClientPlayPacket;
-import com.xiii.libertycity.core.processors.ServerPlayPacket;
+import com.xiii.libertycity.core.manager.profile.utils.ProfileUtils;
+import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
+import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
@@ -45,7 +46,6 @@ public class RegisterEvent implements Data {
 
                         temp_rpFirstName = message;
                         awaitResponse_rpFirstName = true;
-                        // TODO: Add easter eggs like if name = "Jack" say something funny
                         player.sendMessage(MsgType.STEVE_HIDDEN.getMessage() + "Mmmh... Alors si j'ai bien compris, tu t'appel §a§l" + temp_rpFirstName + "§r, c'est bien ça? §7(Oui/Non)");
                     } else player.sendMessage(MsgType.STEVE_HIDDEN.getMessage() + "§cHop hop hop gamin! J'suis pas une machine moi, depuis quand on met autre chose que des lettres dans un prénom?! Tu tes pris pour Elon Musk ou quoi? Bon alors, tu veut bien me la refaire en français cette fois?");
 
@@ -79,7 +79,6 @@ public class RegisterEvent implements Data {
 
                         temp_rpLastName = message;
                         awaitResponse_rpLastName = true;
-                        //TODO: Add easter eggs to make fun of their name
                         player.sendMessage(MsgType.STEVE_FIRST.getMessage() + "Ah bon? Tu t'appel vraiment §a§l" + profile.rpFirstName + " §2§l" + temp_rpLastName + "§r? Sa me rappel qu'unlqun... §7(Oui/Non)");
                     } else player.sendMessage(MsgType.STEVE_FIRST.getMessage() + "§cNan mais oh, tu sais pas écrire ou quoi?! Un nom c'est des LETTRES, DES LETTRES! On est pas en cours de maths ici hien! J'vais pas te demander de me calculer x ou y! Alors refait la en français sans ton problème machin de maths");
                 } else player.sendMessage(MsgType.STEVE_FIRST.getMessage() + "§cMais dis donc mon vieux c'est que tchache bien! Mais la j'aimerais bien juste connaître ton nom, juste ton nom oui pas ton arbre généalogique... Alors si tu voudrais bien la refaire mais entre 3 et 18 caractères, je prend!");
@@ -91,8 +90,20 @@ public class RegisterEvent implements Data {
 
                 if (message.contains("oui")) {
 
+                    if (!ProfileUtils.isNameAvailable(temp_rpFirstName, temp_rpLastName)) {
+
+                        shutdown(player);
+                        player.sendMessage(MsgType.STEVE_FIRST.getMessage() + "§cT'essairais pas de te faire passer pour qunlqu'un d'autre par hasard? Je connais déja qunlqu'un qui s'appel comme sa dans la ville...Bon aller on va reprendre depuis le tous début pour être sur.");
+                        player.sendTitle("", "§7§oCommencez par dire votre prénom au barman.", 3 * 20, 900 * 20, 2 * 20);
+                        return;
+                    }
+
+                    ProfileUtils.getDataBaseRPFirstNames().put(temp_rpFirstName, player.getUniqueId());
+                    ProfileUtils.getDataBaseRPLastNames().put(temp_rpLastName, player.getUniqueId());
+                    ProfileUtils.updateServerProfile();
+
                     profile.rpLastName = temp_rpLastName;
-                    player.sendTitle("", "§7§oFinissez par dire votre âge à §e§oSteve Rowland§7.", 3*20, 900*20, 2*20);
+                    player.sendTitle("", "§7§oFinissez par dire votre âge à §e§oSteve Rowland§7.", 3 * 20, 900 * 20, 2 * 20);
                     player.sendMessage(MsgType.STEVE_FULL.getMessage() + "Nan c'est pas vrai... §a§l" + profile.rpFirstName + " §2§l" + profile.rpLastName + "§r c'est toi?! MICHEL VIENS VOIR! J'en crois pas mes yeux, sa fait un baille que je me demande ou t'était partis! Tu te souviens peut être de moi tiens, c'est moi §eSteve Rowland§r, je fesais partis du groupe de Hackeur ya quelque années de sa. Ta du prendre un ptit coup de vieux depuis, nan? Ta quel §6age§r maintenant dis donc?");
                 } else if (message.contains("non")) {
 
