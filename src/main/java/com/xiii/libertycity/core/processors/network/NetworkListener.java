@@ -10,8 +10,8 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerRotation;
 import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.manager.profile.Profile;
-import com.xiii.libertycity.core.processors.ClientPlayPacket;
-import com.xiii.libertycity.core.processors.ServerPlayPacket;
+import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
+import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.TaskUtils;
 import org.bukkit.entity.Player;
 
