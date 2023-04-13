@@ -17,7 +17,8 @@ import java.util.zip.ZipOutputStream;
 public class FileManager {
 
     private static final String logDate = TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG_DATE);
-    public static final YamlConfiguration cfg = YamlConfiguration.loadConfiguration(new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + logDate + ".log"));
+    private static final File logFile = new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + logDate + ".log");
+    private static final YamlConfiguration cfg = YamlConfiguration.loadConfiguration(logFile);
 
     public static void saveProfile(Profile profile) {
         try {
@@ -133,7 +134,7 @@ public class FileManager {
     }
 
     public static File getLogFile() {
-        return new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + logDate + ".log");
+        return logFile;
     }
 
     public static YamlConfiguration getCfg() {
