@@ -1,26 +1,17 @@
 package com.xiii.libertycity.roleplay.guis.atm;
 
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
 import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.enums.MsgType;
 import com.xiii.libertycity.core.manager.profile.Profile;
-import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
-import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.core.utils.InventoryUtils;
-import com.xiii.libertycity.roleplay.events.Data;
-import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class GUI implements Data {
+public class GUI {
 
     private final ItemStack glass_empty = InventoryUtils.createItem(Material.STAINED_GLASS_PANE, 1, " ", " ");
     private final ItemStack close_item = InventoryUtils.createItem(Material.BARRIER, 1, "§cRetour");
@@ -40,69 +31,7 @@ public class GUI implements Data {
 
     public int depositedMoney = 0, withdrewMoney = 0;
 
-    public void handle(ClientPlayPacket packet) {
-
-        final Player player = packet.getPlayer();
-
-        //Open ATM
-        if (packet.getType() == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
-
-            final WrapperPlayClientPlayerBlockPlacement wrapperPlayClientPlayerBlockPlacement = packet.getBlockPlacementWrapper();
-
-            final Block block = new Location(player.getWorld(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getX(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getY(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getZ()).getBlock();
-            if (block.getType() == Material.EMERALD_BLOCK) openATM(player, false);
-            //TODO: Change to real ATM block ID
-        }
-
-        if (packet.getType() == PacketType.Play.Client.CLOSE_WINDOW) {
-            if (player.getOpenInventory().getTopInventory().getTitle().contains("ATM")) {
-                processATMClose(player);
-            }
-        }
-
-        //Click in ATM
-        if (packet.getType() == PacketType.Play.Client.CLICK_WINDOW) {
-
-            final WrapperPlayClientClickWindow wrapperPlayClientClickWindow = packet.getClickWindow();
-            final String inventoryTitle = player.getOpenInventory().getTopInventory().getTitle();
-
-            if (inventoryTitle.equalsIgnoreCase(MsgType.BANK.getMessage() + "§2§lATM")) {
-
-                //Main ATM menu
-                if (wrapperPlayClientClickWindow.getSlot() == 10) openDep(player, false);
-                if (wrapperPlayClientClickWindow.getSlot() == 16) openWit(player, false);
-                if (wrapperPlayClientClickWindow.getSlot() == 35) player.closeInventory();
-            }
-
-            if (inventoryTitle.equalsIgnoreCase(MsgType.BANK.getMessage() + "§2§lATM §7» §a§LDepôt") && isMoneySlot(wrapperPlayClientClickWindow.getSlot())) {
-                if (processDep(player, SpigotConversionUtil.toBukkitItemStack(wrapperPlayClientClickWindow.getCarriedItemStack()), wrapperPlayClientClickWindow.getButton())) {
-                    ChatUtils.multicast(MsgType.BANK.getMessage() + "§fTransaction éffectuée avec succès!", player);
-                } else ChatUtils.multicast(MsgType.BANK.getMessage() + "§fTransaction echouée.", player);
-                openDep(player, true);
-            }
-
-            if (inventoryTitle.equalsIgnoreCase(MsgType.BANK.getMessage() + "§2§lATM §7» §c§LRetrait") && isMoneySlot(wrapperPlayClientClickWindow.getSlot()) ) {
-                if (processWit(player, SpigotConversionUtil.toBukkitItemStack(wrapperPlayClientClickWindow.getCarriedItemStack()), wrapperPlayClientClickWindow.getButton())) {
-                    ChatUtils.multicast(MsgType.BANK.getMessage() + "§fTransaction éffectuée avec succès!", player);
-                } else ChatUtils.multicast(MsgType.BANK.getMessage() + "§fTransaction échouée.", player);
-                openWit(player, true);
-            }
-
-            if (inventoryTitle.equalsIgnoreCase(MsgType.BANK.getMessage() + "§2§lATM §7» §a§LDepôt") || inventoryTitle.equalsIgnoreCase(MsgType.BANK.getMessage() + "§2§lATM §7» §c§LRetrait")) {
-                if (wrapperPlayClientClickWindow.getSlot() == 35) openATM(player, false);
-            }
-
-            if (inventoryTitle.contains("ATM")) {
-                packet.getEvent().setCancelled(true);
-                player.updateInventory();
-            }
-        }
-    }
-
-    public void handle(ServerPlayPacket packet) {
-    }
-
-    private void openATM(final Player player, final boolean refresh) {
+    public void openATM(final Player player, final boolean refresh) {
 
         final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
         final long bankBalance = profile.rpBankBalance;
@@ -124,7 +53,7 @@ public class GUI implements Data {
         } else player.updateInventory();
     }
 
-    private void openWit(final Player player, final boolean refresh) {
+    public void openWit(final Player player, final boolean refresh) {
 
         final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
         final long bankBalance = profile.rpBankBalance;
@@ -181,7 +110,7 @@ public class GUI implements Data {
         }
     }
 
-    private void openDep(final Player player, final boolean refresh) {
+    public void openDep(final Player player, final boolean refresh) {
 
         final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
         final long bankBalance = profile.rpBankBalance;
@@ -249,7 +178,7 @@ public class GUI implements Data {
         return number == 0 ? 1 : Integer.parseInt(String.valueOf(Math.round(number)));
     }
 
-    private boolean processDep(final Player player, final ItemStack itemStack, final int button) {
+    public boolean processDep(final Player player, final ItemStack itemStack, final int button) {
 
         final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
 
@@ -294,7 +223,7 @@ public class GUI implements Data {
         return false;
     }
 
-    private boolean processWit(final Player player, final ItemStack itemStack, final int button) {
+    public boolean processWit(final Player player, final ItemStack itemStack, final int button) {
 
         final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
 
@@ -340,7 +269,7 @@ public class GUI implements Data {
         return false;
     }
 
-    private void processATMClose(final Player player) {
+    public void processATMClose(final Player player) {
 
         if (depositedMoney > 0) ChatUtils.multicast(MsgType.BANK.getMessage() + "§fVous avez déposé §6$" + depositedMoney + "§f! Bonne journée.", player);
         if (withdrewMoney > 0) ChatUtils.multicast(MsgType.BANK.getMessage() + "§fVous avez retiré §6$" + withdrewMoney + "§f! Bonne journée.", player);
@@ -349,7 +278,7 @@ public class GUI implements Data {
         withdrewMoney = 0;
     }
 
-    private boolean isMoneySlot(final int slot) {
+    public boolean isMoneySlot(final int slot) {
         return (slot >= 10 && slot <= 16) || (slot >= 20 && slot <= 24);
     }
 

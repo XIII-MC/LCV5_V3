@@ -6,7 +6,8 @@ import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.roleplay.ChatSystem;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
-import com.xiii.libertycity.roleplay.guis.atm.GUI;
+import com.xiii.libertycity.roleplay.guis.atm.events.network.ATMHandle;
+import com.xiii.libertycity.roleplay.guis.trashcan.events.network.TrashcanHandle;
 import com.xiii.libertycity.roleplay.items.wallet.events.network.WalletHandle;
 import org.bukkit.entity.Player;
 
@@ -28,8 +29,8 @@ public class Profile implements java.io.Serializable {
     //------------------------------------
     private transient RegisterEvent registerEvent;
     private transient ChatSystem chatSystem;
-    private transient GUI atmGUI;
-    private transient com.xiii.libertycity.roleplay.guis.trashcan.GUI trashcanGUI;
+    private transient ATMHandle atmHandle;
+    private transient TrashcanHandle trashcanGUI;
     private transient WalletHandle walletHandle;
     //------------------------------------
     public String rpFirstName;
@@ -69,8 +70,8 @@ public class Profile implements java.io.Serializable {
 
         this.registerEvent = new RegisterEvent();
         this.chatSystem = new ChatSystem();
-        this.atmGUI = new GUI();
-        this.trashcanGUI = new com.xiii.libertycity.roleplay.guis.trashcan.GUI();
+        this.atmHandle = new ATMHandle();
+        this.trashcanGUI = new TrashcanHandle();
         this.walletHandle = new WalletHandle();
     }
 
@@ -84,7 +85,7 @@ public class Profile implements java.io.Serializable {
 
         this.registerEvent.handle(packet);
         this.chatSystem.handle(packet);
-        this.atmGUI.handle(packet);
+        this.atmHandle.handle(packet);
         this.trashcanGUI.handle(packet);
         this.walletHandle.handle(packet);
     }
