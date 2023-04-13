@@ -1,4 +1,4 @@
-package com.xiii.libertycity.core.processors;
+package com.xiii.libertycity.core.processors.network.packet;
 
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
