@@ -6,8 +6,8 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.enums.MsgType;
 import com.xiii.libertycity.core.manager.profile.Profile;
-import com.xiii.libertycity.core.processors.ClientPlayPacket;
-import com.xiii.libertycity.core.processors.ServerPlayPacket;
+import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
+import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.core.utils.InventoryUtils;
 import com.xiii.libertycity.roleplay.events.Data;
