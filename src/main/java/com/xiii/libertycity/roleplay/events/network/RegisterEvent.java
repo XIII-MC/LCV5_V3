@@ -12,6 +12,7 @@ import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
 import com.xiii.libertycity.roleplay.events.Data;
+import com.xiii.libertycity.roleplay.items.idcard.IDCardManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -139,11 +140,11 @@ public class RegisterEvent implements Data {
                     profile.rpChat = 0;
                     profile.rpBankBalance = 0;
                     profile.joinDate = TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.FULL);
-                    //give player 20$ bill
+                    player.getInventory().addItem(new ItemStack(Material.IRON_NUGGET));
                     player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 1));
-                    //give player ID card
-                    //give player wallet
-                    //TODO: do all the gives above
+                    IDCardManager.createIDCard(player);
+                    player.getInventory().addItem(new ItemStack(Material.DIAMOND));
+                    //TODO: Change items to real modded item's id
                     player.sendTitle("§fBienvenue sur §a§lLiberty§2§lCity §4§lRP §6§LV5 §f!", "§7Bonne aventure §a§l" + profile.rpFirstName + " §2§l" + profile.rpLastName + "§7.", 3*20, 10*20, 2*20);
                     ChatUtils.broadcast("");
                     ChatUtils.broadcast(MsgType.MAIRIE.getMessage() + "§a§l" + profile.rpFirstName + " §2§l" + profile.rpLastName + " §frejoint la ville!");
@@ -152,6 +153,7 @@ public class RegisterEvent implements Data {
                     player.sendMessage(MsgType.MICHEL_FULL.getMessage() + "Et hop la, c'est prét! Un bon gros beef steak pour notre chère... MAIS ATTEND, C'EST TOI §a§l" + profile.rpFirstName + " §2§l" + profile.rpLastName + "§r! Rohhhh sa fait si longtemps que j'avais pas entendu parler de toi! Ravis de te revoir!" );
                     player.sendMessage(MsgType.STEVE_FULL.getMessage() + "Bon aller, prend ton beef §6steak§r, t'en aura surement besoin! A plus!");
                     profile.getProfileThread().execute(() -> FileManager.saveProfile(profile));
+                    packet.getEvent().setCancelled(true);
 
                 } else if (message.contains("non")) {
 
