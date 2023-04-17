@@ -8,6 +8,7 @@ import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.roleplay.events.Data;
 import com.xiii.libertycity.roleplay.items.handcuffs.utils.Targeter;
+import com.xiii.libertycity.roleplay.utils.ItemUtils;
 import com.xiii.libertycity.roleplay.utils.NameConverter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -17,7 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class HandcuffsHandle implements Data {
+public class HandcuffsHandle extends ItemUtils implements Data {
 
     private BukkitTask handcuffDelayTask;
 
@@ -27,8 +28,7 @@ public class HandcuffsHandle implements Data {
 
             final Player player = packet.getPlayer();
 
-            //TODO: Change to real handcuffs modded item's id
-            if (player.getInventory().getItemInMainHand().getType().equals(Material.TRIPWIRE_HOOK)) {
+            if (compareMaterial(player.getInventory().getItemInMainHand().getType(), getMaterial(handcuffs))) {
 
                 if (packet.getInteractEntity().getTarget().isPresent()) {
 
@@ -101,6 +101,5 @@ public class HandcuffsHandle implements Data {
         }
     }
 
-    public void handle(final ServerPlayPacket packet) {
-    }
+    public void handle(final ServerPlayPacket packet) {}
 }

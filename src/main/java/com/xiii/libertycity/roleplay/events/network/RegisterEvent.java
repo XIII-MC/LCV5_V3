@@ -13,12 +13,13 @@ import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
 import com.xiii.libertycity.roleplay.events.Data;
 import com.xiii.libertycity.roleplay.items.idcard.IDCardManager;
+import com.xiii.libertycity.roleplay.utils.ItemUtils;
 import com.xiii.libertycity.roleplay.utils.PhoneNumber;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class RegisterEvent implements Data {
+public class RegisterEvent extends ItemUtils implements Data {
 
     private static String temp_rpFirstName, temp_rpLastName, temp_rpAge;
     private static boolean awaitResponse_rpFirstName, awaitResponse_rpLastName, awaitResponse_rpAge;
@@ -139,12 +140,11 @@ public class RegisterEvent implements Data {
                     profile.rpAge = Integer.parseInt(temp_rpAge);
                     profile.isVerified = true;
                     profile.joinDate = TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.FULL);
-                    player.getInventory().addItem(new ItemStack(Material.IRON_NUGGET));
+                    player.getInventory().addItem(b20);
                     player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 1));
                     IDCardManager.createIDCard(player);
                     PhoneNumber.newNumber(player);
-                    player.getInventory().addItem(new ItemStack(Material.DIAMOND));
-                    //TODO: Change items to real modded item's id
+                    player.getInventory().addItem(wallet);
                     player.sendTitle("§fBienvenue sur §a§lLiberty§2§lCity §4§lRP §6§LV5 §f!", "§7Bonne aventure §a§l" + profile.rpFirstName + " §2§l" + profile.rpLastName + "§7.", 3*20, 10*20, 2*20);
                     ChatUtils.broadcast("");
                     ChatUtils.broadcast(MsgType.MAIRIE.getMessage() + "§a§l" + profile.rpFirstName + " §2§l" + profile.rpLastName + " §frejoint la ville!");

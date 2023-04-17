@@ -2,6 +2,7 @@ package com.xiii.libertycity.roleplay.items.idcard;
 
 import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.manager.profile.Profile;
+import com.xiii.libertycity.roleplay.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,14 +13,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class IDCardManager {
+public class IDCardManager extends ItemUtils {
 
     public static void createIDCard(final Player player) {
 
         final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
         final String encryptedID = "" + (Math.random() * Math.random() * 698745215 + Math.random() / Math.random() % Math.random() * 325874169 / (Math.random() * Math.random() / Math.random() - Math.random()) + Math.random() * 982735110);
-        //TODO: Change to real id card modded item's id
-        final ItemStack idCard = new ItemStack(Material.PAPER);
+        final ItemStack idCard = IDCard;
         final ItemMeta idCard_meta = idCard.getItemMeta();
 
         idCard_meta.setDisplayName("§rCarte d'identitée");

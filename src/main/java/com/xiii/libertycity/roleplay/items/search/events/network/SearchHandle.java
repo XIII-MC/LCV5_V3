@@ -9,12 +9,13 @@ import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.roleplay.events.Data;
 import com.xiii.libertycity.roleplay.items.handcuffs.utils.Targeter;
 import com.xiii.libertycity.roleplay.items.search.utils.InvSee;
+import com.xiii.libertycity.roleplay.utils.ItemUtils;
 import com.xiii.libertycity.roleplay.utils.NameConverter;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public class SearchHandle implements Data {
+public class SearchHandle extends ItemUtils implements Data {
 
     public void handle(final ClientPlayPacket packet) {
 
@@ -22,8 +23,7 @@ public class SearchHandle implements Data {
 
             final Player player = packet.getPlayer();
 
-            //TODO: Change stick to real modded item's id
-            if (player.getInventory().getItemInMainHand().getType().equals(Material.STICK)) {
+            if (compareMaterial(player.getInventory().getItemInMainHand().getType(), getMaterial(searchItem))) {
 
                 if (packet.getInteractEntity().getTarget().isPresent()) {
 

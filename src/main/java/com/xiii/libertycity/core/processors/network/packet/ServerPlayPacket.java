@@ -19,7 +19,8 @@ public class ServerPlayPacket {
         this.player = (Player) e.getPlayer();
         this.packetEvent = e;
 
-        this.packet = packet;
+        switch (this.packet = packet) {
+        }
 
     }
 

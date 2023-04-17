@@ -6,12 +6,13 @@ import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.roleplay.events.Data;
 import com.xiii.libertycity.roleplay.guis.trashcan.GUI;
+import com.xiii.libertycity.roleplay.utils.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public class TrashcanHandle implements Data {
+public class TrashcanHandle extends ItemUtils implements Data {
 
     private final GUI trashcanGUI = new GUI();
 
@@ -24,11 +25,10 @@ public class TrashcanHandle implements Data {
             final WrapperPlayClientPlayerBlockPlacement wrapperPlayClientPlayerBlockPlacement = packet.getBlockPlacementWrapper();
 
             final Block block = new Location(player.getWorld(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getX(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getY(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getZ()).getBlock();
-            if (block.getType() == Material.DIAMOND_BLOCK) {
+            if (compareMaterial(block.getType(), getMaterial(trashcan))) {
                 this.trashcanGUI.openTrashcan(player, false);
                 packet.getEvent().setCancelled(true);
             }
-            //TODO: Change to real trash can block ID
         }
 
         if (packet.getType() == PacketType.Play.Client.CLICK_WINDOW) {
@@ -41,6 +41,5 @@ public class TrashcanHandle implements Data {
 
     }
 
-    public void handle(final ServerPlayPacket packet) {
-    }
+    public void handle(final ServerPlayPacket packet) {}
 }

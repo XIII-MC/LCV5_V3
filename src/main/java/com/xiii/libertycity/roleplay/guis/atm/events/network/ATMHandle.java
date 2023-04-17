@@ -9,13 +9,13 @@ import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.roleplay.events.Data;
 import com.xiii.libertycity.roleplay.guis.atm.GUI;
+import com.xiii.libertycity.roleplay.utils.ItemUtils;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public class ATMHandle implements Data {
+public class ATMHandle extends ItemUtils implements Data {
 
     private final GUI atmGUI = new GUI();
 
@@ -29,8 +29,7 @@ public class ATMHandle implements Data {
             final WrapperPlayClientPlayerBlockPlacement wrapperPlayClientPlayerBlockPlacement = packet.getBlockPlacementWrapper();
 
             final Block block = new Location(player.getWorld(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getX(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getY(), wrapperPlayClientPlayerBlockPlacement.getBlockPosition().toVector3d().getZ()).getBlock();
-            if (block.getType() == Material.EMERALD_BLOCK) this.atmGUI.openATM(player, false);
-            //TODO: Change to real ATM block ID
+            if (compareMaterial(block.getType(), getMaterial(ATM))) this.atmGUI.openATM(player, false);
         }
 
         if (packet.getType() == PacketType.Play.Client.CLOSE_WINDOW) {
@@ -54,14 +53,14 @@ public class ATMHandle implements Data {
             }
 
             if (inventoryTitle.equalsIgnoreCase(MsgType.BANK.getMessage() + "§2§lATM §7» §a§LDepôt") && this.atmGUI.isMoneySlot(wrapperPlayClientClickWindow.getSlot())) {
-                if (this.atmGUI.processDep(player, SpigotConversionUtil.toBukkitItemStack(wrapperPlayClientClickWindow.getCarriedItemStack()), wrapperPlayClientClickWindow.getButton())) {
+                if (this.atmGUI.processDep(player, getItemStack(player.getOpenInventory().getTopInventory(), wrapperPlayClientClickWindow.getSlot()), wrapperPlayClientClickWindow.getButton())) {
                     ChatUtils.multicast(MsgType.BANK.getMessage() + "§fTransaction éffectuée avec succès!", player);
                 } else ChatUtils.multicast(MsgType.BANK.getMessage() + "§fTransaction echouée.", player);
                 this.atmGUI.openDep(player, true);
             }
 
             if (inventoryTitle.equalsIgnoreCase(MsgType.BANK.getMessage() + "§2§lATM §7» §c§LRetrait") && this.atmGUI.isMoneySlot(wrapperPlayClientClickWindow.getSlot()) ) {
-                if (this.atmGUI.processWit(player, SpigotConversionUtil.toBukkitItemStack(wrapperPlayClientClickWindow.getCarriedItemStack()), wrapperPlayClientClickWindow.getButton())) {
+                if (this.atmGUI.processWit(player, getItemStack(player.getOpenInventory().getTopInventory(), wrapperPlayClientClickWindow.getSlot()), wrapperPlayClientClickWindow.getButton())) {
                     ChatUtils.multicast(MsgType.BANK.getMessage() + "§fTransaction éffectuée avec succès!", player);
                 } else ChatUtils.multicast(MsgType.BANK.getMessage() + "§fTransaction échouée.", player);
                 this.atmGUI.openWit(player, true);
@@ -78,6 +77,5 @@ public class ATMHandle implements Data {
         }
     }
 
-    public void handle(ServerPlayPacket packet) {
-    }
+    public void handle(ServerPlayPacket packet) {}
 }
