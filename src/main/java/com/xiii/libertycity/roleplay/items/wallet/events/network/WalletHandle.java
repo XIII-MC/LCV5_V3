@@ -25,7 +25,7 @@ public class WalletHandle extends ItemUtils implements Data {
 
             final Player player = packet.getPlayer();
 
-            if (compareMaterial(player.getInventory().getItemInMainHand().getType(), getMaterial(searchItem))) {
+            if (compareMaterial(player.getInventory().getItemInMainHand().getType(), getMaterial(wallet))) {
 
                 this.walletManager.openWallet(player.getInventory().getItemInMainHand(), player);
             }
