@@ -10,13 +10,11 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
-
 public final class ChatUtils {
 
     public static void broadcast(final String message) {
 
-        LibertyCity.getInstance().getThread().submit(() -> {
+        LibertyCity.getInstance().getThread().execute(() -> {
 
             final ChatMessage chatMessage = new ChatMessageLegacy(Component.text(message), ChatTypes.CHAT);
 
@@ -30,27 +28,16 @@ public final class ChatUtils {
 
         if (players == null) return;
 
-        LibertyCity.getInstance().getThread().submit(() -> {
+        LibertyCity.getInstance().getThread().execute(() -> {
 
             final ChatMessage chatMessage = new ChatMessageLegacy(Component.text(message), ChatTypes.CHAT);
 
             final WrapperPlayServerChatMessage packet = new WrapperPlayServerChatMessage(chatMessage);
 
-            BetterStream.filter(players, player -> LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).isVerified).forEach(player -> PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getPlayerManager().getChannel(player), packet));
-        });
-    }
+            for (Player player : players) {
 
-    public static void multicast(final String message, final Collection<Player> players) {
-
-        if (players == null || players.isEmpty()) return;
-
-        LibertyCity.getInstance().getThread().submit(() -> {
-
-            final ChatMessage chatMessage = new ChatMessageLegacy(Component.text(message), ChatTypes.CHAT);
-
-            final WrapperPlayServerChatMessage packet = new WrapperPlayServerChatMessage(chatMessage);
-
-            BetterStream.filter(players, player -> LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).isVerified).forEach(player -> PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getPlayerManager().getChannel(player), packet));
+                if (LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).isVerified) PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getPlayerManager().getChannel(player), packet);
+            }
         });
     }
 }
