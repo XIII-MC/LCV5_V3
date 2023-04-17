@@ -74,7 +74,7 @@ public class FileManager {
 
     public static void log(final String message, final String customFolderPath, final String customFilePath) {
 
-        LibertyCity.getInstance().getThread().submit(() -> {
+        LibertyCity.getInstance().getThread().execute(() -> {
 
             final Pattern pt = Pattern.compile("\\§+.");
             final Matcher match = pt.matcher(message);
@@ -98,7 +98,7 @@ public class FileManager {
                 }
             }
 
-            cfg.set(logTime, output);
+            getCfg().set(logTime, output);
         });
     }
 
