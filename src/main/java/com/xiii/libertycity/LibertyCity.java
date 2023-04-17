@@ -4,13 +4,15 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.keenant.tabbed.Tabbed;
 import com.xiii.libertycity.core.listeners.ProfileListener;
 import com.xiii.libertycity.core.manager.files.FileManager;
-import com.xiii.libertycity.core.manager.profile.ProfileManager;
 import com.xiii.libertycity.core.manager.profile.Profile;
+import com.xiii.libertycity.core.manager.profile.ProfileManager;
+import com.xiii.libertycity.core.manager.threads.ProfileThread;
 import com.xiii.libertycity.core.manager.threads.ThreadManager;
 import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
 import com.xiii.libertycity.core.processors.network.NetworkListener;
 import com.xiii.libertycity.core.tasks.LogExportTask;
 import com.xiii.libertycity.core.tasks.TickTask;
+import com.xiii.libertycity.core.tasks.clearlag.ClearLagTask;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -27,8 +29,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +43,6 @@ public final class LibertyCity extends JavaPlugin {
     private ThreadManager threadManager;
     private static Logger logger;
     private PluginDescriptionFile pdf;
-    private final ExecutorService thread = Executors.newSingleThreadExecutor();
     private final UUID serverUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     //Non Internals
@@ -77,6 +76,7 @@ public final class LibertyCity extends JavaPlugin {
         //Init Non Internals
         log(Level.INFO, "Initialization...");
         bossBar = Bukkit.createBossBar("§k", BarColor.WHITE, BarStyle.SEGMENTED_6);
+        bossBar.setVisible(false);
         // .addEventListeners(new SlashCommand())
         //jda = JDABuilder.createDefault("MTA2NTMxNDQ1NDk4NTc4NTQxNg.GJBEwB.YfdVOSjaLbwFQ3FN2Q3_B07xKaR52K_98JRftM").setActivity(Activity.playing("RUNNING DEVMODE")).build();
         tab = new Tabbed(this);
@@ -87,7 +87,8 @@ public final class LibertyCity extends JavaPlugin {
         //Tasks
         log(Level.INFO, "Starting tasks...");
         new TickTask(this).runTaskTimerAsynchronously(this, 50L, 0L);
-        new LogExportTask().runTaskTimerAsynchronously(this, 20*10, 0L);
+        new LogExportTask().runTaskTimer(this, 20*10, 20*10);
+        new ClearLagTask(this).runTaskTimerAsynchronously(this, 20*1800, 20*1800);
 
         //Bukkit Listeners
         log(Level.INFO, "Starting listeners...");
@@ -141,9 +142,6 @@ public final class LibertyCity extends JavaPlugin {
         this.profileManager.shutdown();
         this.threadManager.shutdown();
 
-        //Shutdown thread
-        this.thread.shutdownNow();
-
         //Cancel all tasks
         Bukkit.getScheduler().cancelTasks(this);
 
@@ -183,8 +181,8 @@ public final class LibertyCity extends JavaPlugin {
         return bossBar;
     }
 
-    public ExecutorService getThread() {
-        return thread;
+    public ProfileThread getThread() {
+        return getServerProfile().getProfileThread();
     }
 
     public UUID getServerUUID() {
