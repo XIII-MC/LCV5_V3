@@ -10,6 +10,7 @@ import com.xiii.libertycity.roleplay.guis.atm.events.network.ATMHandle;
 import com.xiii.libertycity.roleplay.guis.trashcan.events.network.TrashcanHandle;
 import com.xiii.libertycity.roleplay.items.handcuffs.events.network.HandcuffsHandle;
 import com.xiii.libertycity.roleplay.items.idcard.events.network.IDCardHandle;
+import com.xiii.libertycity.roleplay.items.search.events.network.SearchHandle;
 import com.xiii.libertycity.roleplay.items.wallet.events.network.WalletHandle;
 import org.bukkit.entity.Player;
 
@@ -23,6 +24,7 @@ public class Profile implements java.io.Serializable {
     //----------------SERVER--------------
     public Map<String, UUID> db_rpFirstName;
     public Map<String, UUID> db_rpLastName;
+    public Map<String, UUID> db_phoneNumbers;
     //------------------------------------
     public final UUID playerUUID;
     public transient String playerName;
@@ -36,6 +38,7 @@ public class Profile implements java.io.Serializable {
     private transient WalletHandle walletHandle;
     private transient IDCardHandle idCardHandle;
     private transient HandcuffsHandle handcuffsHandle;
+    private transient SearchHandle searchHandle;
     //------------------------------------
     public String rpFirstName;
     public String rpLastName;
@@ -48,7 +51,7 @@ public class Profile implements java.io.Serializable {
     public transient boolean spyGlobal = false;
     public transient int spyChat = -1; // 0=HRP 1=RP 2=POLICE 3=GANG
     public String encryptedIDCardID;
-    public boolean isHandcuffed;
+    public String phoneNumber;
 
     //Bank
     public long rpBankBalance = 0;
@@ -62,6 +65,12 @@ public class Profile implements java.io.Serializable {
 
     //Temp
     public transient Player handcuffedBy;
+    public transient Player searchedBy;
+    public transient Player searchingWho;
+    public transient boolean isHandcuffed;
+    public transient boolean isSearched;
+    public transient boolean isSearching;
+    public transient int handcuffedDelay;
 
     public Profile(final UUID uuid) {
         this.playerUUID = uuid;
@@ -76,6 +85,7 @@ public class Profile implements java.io.Serializable {
         this.playerName = player.getName();
         this.playerEntity = player.getPlayer();
         this.profileThread = LibertyCity.getInstance().getThreadManager().getAvailableProfileThread();
+        LibertyCity.getInstance().getBossBar().addPlayer(player);
 
         this.registerEvent = new RegisterEvent();
         this.chatSystem = new ChatSystem();
@@ -84,11 +94,14 @@ public class Profile implements java.io.Serializable {
         this.walletHandle = new WalletHandle();
         this.idCardHandle = new IDCardHandle();
         this.handcuffsHandle = new HandcuffsHandle();
+        this.searchHandle = new SearchHandle();
     }
 
     public void serverInitialize() {
         if (this.db_rpFirstName == null) this.db_rpFirstName = new ConcurrentHashMap<>();
         if (this.db_rpLastName == null) this.db_rpLastName = new ConcurrentHashMap<>();
+        if (this.db_phoneNumbers == null) this.db_phoneNumbers = new ConcurrentHashMap<>();
+        this.profileThread = LibertyCity.getInstance().getThreadManager().getAvailableProfileThread();
         this.isVerified = true;
     }
 
@@ -101,6 +114,7 @@ public class Profile implements java.io.Serializable {
         this.walletHandle.handle(packet);
         this.idCardHandle.handle(packet);
         this.handcuffsHandle.handle(packet);
+        this.searchHandle.handle(packet);
     }
 
     public void handleServerNetty(final ServerPlayPacket packet) {
