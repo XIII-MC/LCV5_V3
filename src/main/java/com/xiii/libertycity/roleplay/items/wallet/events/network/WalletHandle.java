@@ -6,6 +6,7 @@ import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.roleplay.events.Data;
 import com.xiii.libertycity.roleplay.items.wallet.WalletManager;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -44,7 +45,7 @@ public class WalletHandle implements Data {
                 }
 
                 //TODO: Change to real wallet modded item's id
-                if (packet.getClickWindow().getCarriedItemStack().getType().equals(Material.DIAMOND)) {
+                if (SpigotConversionUtil.toBukkitItemStack(packet.getClickWindow().getCarriedItemStack()).getType().equals(Material.DIAMOND)) {
 
                     packet.getEvent().setCancelled(true);
                     player.updateInventory();
