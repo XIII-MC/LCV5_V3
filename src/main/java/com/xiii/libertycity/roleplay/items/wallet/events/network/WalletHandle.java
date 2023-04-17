@@ -5,14 +5,17 @@ import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.roleplay.events.Data;
+import com.xiii.libertycity.roleplay.guis.atm.GUI;
 import com.xiii.libertycity.roleplay.items.wallet.WalletManager;
+import com.xiii.libertycity.roleplay.utils.ItemUtils;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 
-public class WalletHandle implements Data {
+public class WalletHandle extends ItemUtils implements Data {
 
     private final WalletManager walletManager = new WalletManager();
 
@@ -22,11 +25,9 @@ public class WalletHandle implements Data {
 
             final Player player = packet.getPlayer();
 
-            if (player.getInventory().getItemInMainHand().getType().equals(Material.DIAMOND)) {
+            if (compareMaterial(player.getInventory().getItemInMainHand().getType(), getMaterial(searchItem))) {
 
                 this.walletManager.openWallet(player.getInventory().getItemInMainHand(), player);
-
-                //TODO: Change to real wallet modded ID
             }
         }
 
@@ -34,22 +35,22 @@ public class WalletHandle implements Data {
 
             final Player player = packet.getPlayer();
 
-            //TODO: Change to real wallet modded item's id
             if (player.getOpenInventory().getTopInventory().getTitle().contains("Porte feuille")) {
 
-                if (!player.getInventory().getItemInMainHand().getType().equals(Material.DIAMOND) || !Objects.equals(this.walletManager.getDecryptedID(player.getInventory().getItemInMainHand().getItemMeta().getLore()), this.walletManager.getCachedDecryptedID())) {
+                if (!compareMaterial(player.getInventory().getItemInMainHand().getType(), getMaterial(wallet)) || !Objects.equals(this.walletManager.getDecryptedID(player.getInventory().getItemInMainHand().getItemMeta().getLore()), this.walletManager.getCachedDecryptedID())) {
                     packet.getEvent().setCancelled(true);
                     player.closeInventory();
                     player.updateInventory();
                     ChatUtils.multicast("§cUne erreur est survenue. Veuillez garder le porte feuille en §cmain.", player);
                 }
 
-                //TODO: Change to real wallet modded item's id
-                if (SpigotConversionUtil.toBukkitItemStack(packet.getClickWindow().getCarriedItemStack()).getType().equals(Material.DIAMOND)) {
+                final ItemStack itemStack = getItemStack(player.getOpenInventory(), packet.getClickWindow().getSlot());
+
+                if ((!isCard(itemStack) && !GUI.isMoneyItem(itemStack) && !itemStack.getType().equals(Material.AIR)) || compareMaterial(itemStack.getType(), getMaterial(wallet))) {
 
                     packet.getEvent().setCancelled(true);
                     player.updateInventory();
-                    ChatUtils.multicast("§cUne erreur est survenue. Vous ne pouvez pas déplacer un porte feuille maintenant.", player);
+                    ChatUtils.multicast("§cUne erreur est survenue. Vous ne pouvez pas déplacer cet §cobjet maintenant.", player);
                 }
             }
         }
@@ -58,8 +59,7 @@ public class WalletHandle implements Data {
 
             final Player player = packet.getPlayer();
 
-            //TODO: Change to real wallet modded item's id
-            if (player.getOpenInventory().getTopInventory().getTitle().contains("Porte feuille") && player.getInventory().getItemInMainHand().getType().equals(Material.DIAMOND) && this.walletManager.getDecryptedID(player.getInventory().getItemInMainHand().getItemMeta().getLore()).equalsIgnoreCase(this.walletManager.getCachedDecryptedID())) {
+            if (player.getOpenInventory().getTopInventory().getTitle().contains("Porte feuille") && compareMaterial(player.getInventory().getItemInMainHand().getType(), getMaterial(wallet)) && this.walletManager.getDecryptedID(player.getInventory().getItemInMainHand().getItemMeta().getLore()).equalsIgnoreCase(this.walletManager.getCachedDecryptedID())) {
 
                 this.walletManager.closeWallet(player.getOpenInventory().getTopInventory(), player);
             }
@@ -82,5 +82,9 @@ public class WalletHandle implements Data {
                 }
             }
         }
+    }
+
+    private boolean isCard(final ItemStack itemStack) {
+        return compareMaterial(itemStack.getType(), getMaterial(IDCard));
     }
 }
