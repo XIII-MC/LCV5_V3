@@ -13,7 +13,7 @@ public class LogExportTask extends BukkitRunnable {
     @Override
     public void run() {
         try {
-            FileManager.getCfg().save(FileManager.getLogFile());
+            if (FileManager.getCfg() != null) FileManager.getCfg().save(FileManager.getLogFile());
         } catch (IOException e) {
             e.printStackTrace();
         }
