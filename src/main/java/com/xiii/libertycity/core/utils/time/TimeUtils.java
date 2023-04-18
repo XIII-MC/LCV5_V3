@@ -9,7 +9,7 @@ public class TimeUtils {
     private static final DateFormat basicFormat = new SimpleDateFormat("dd/MM/yyyy");
     private static final DateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
     private static final DateFormat fullFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    private static final DateFormat logFormat = new SimpleDateFormat("HH:mm:ss:SSSS dd/MM/yyyy");
+    private static final DateFormat logFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
     private static final DateFormat logDateFormat = new SimpleDateFormat("dd_MM_yyy");
 
     public static String convertMillis(final long millis, TimeFormat formatType) {

@@ -10,7 +10,6 @@ import com.xiii.libertycity.core.manager.threads.ProfileThread;
 import com.xiii.libertycity.core.manager.threads.ThreadManager;
 import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
 import com.xiii.libertycity.core.processors.network.NetworkListener;
-import com.xiii.libertycity.core.tasks.LogExportTask;
 import com.xiii.libertycity.core.tasks.TickTask;
 import com.xiii.libertycity.core.tasks.clearlag.ClearLagTask;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
@@ -24,7 +23,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -87,7 +85,6 @@ public final class LibertyCity extends JavaPlugin {
         //Tasks
         log(Level.INFO, "Starting tasks...");
         new TickTask(this).runTaskTimerAsynchronously(this, 50L, 0L);
-        //new LogExportTask().runTaskTimer(this, 20*10, 20*10);
         new ClearLagTask(this).runTaskTimerAsynchronously(this, 20*1800, 20*1800);
 
         //Bukkit Listeners
@@ -131,15 +128,6 @@ public final class LibertyCity extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach(player -> FileManager.saveProfile(this.getProfileManager().getProfile(player.getUniqueId())));
         FileManager.saveProfile(this.getServerProfile());
 
-        //Save log file
-        /*
-        try {
-            FileManager.getCfg().save(FileManager.getLogFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-         */
-
         //Shutdown all managers
         this.profileManager.shutdown();
         this.threadManager.shutdown();
@@ -148,7 +136,6 @@ public final class LibertyCity extends JavaPlugin {
         Bukkit.getScheduler().cancelTasks(this);
 
         instance = null;
-
     }
 
     public static void log(Level level, String message) {

@@ -4,7 +4,6 @@ import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.*;
 import java.util.UUID;
@@ -16,60 +15,56 @@ import java.util.zip.ZipOutputStream;
 
 public class FileManager {
 
-    private static final String logDate = TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG_DATE);
-    private static final File logFile = new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + logDate + ".log");
-    private static final YamlConfiguration cfg = YamlConfiguration.loadConfiguration(logFile);
+    public static void saveProfile(final Profile profile) {
 
-    public static void saveProfile(Profile profile) {
         try {
 
             if (!profile.isVerified) return;
 
-            if (!LibertyCity.getInstance().getDataFolder().exists())
-                LibertyCity.getInstance().getDataFolder().mkdir();
+            if (!LibertyCity.getInstance().getDataFolder().exists()) LibertyCity.getInstance().getDataFolder().mkdir();
 
             final File profilesFolder = new File(LibertyCity.getInstance().getDataFolder() + "/data/");
+
             if (!profilesFolder.exists()) profilesFolder.mkdir();
 
             final File profileFile = new File(LibertyCity.getInstance().getDataFolder() + "/data/", profile.getUUID() + ".ASCII");
+
             profileFile.delete();
             profileFile.createNewFile();
 
             final FileOutputStream fileOut = new FileOutputStream(LibertyCity.getInstance().getDataFolder() + "/data/" + profile.getUUID() + ".ASCII");
-
             final ObjectOutputStream out = new ObjectOutputStream(fileOut);
+
             out.writeObject(profile);
 
-            out.close();
+            fileOut.flush();
             fileOut.close();
-
+            out.flush();
+            out.close();
         } catch (final IOException e) {
 
             e.printStackTrace();
         }
     }
 
-    public static void readProfile(UUID uuid) {
-        final File profileFile = new File(LibertyCity.getInstance().getDataFolder() + "/data/", uuid + ".ASCII");
+    public static void readProfile(final UUID uuid) {
 
         try {
 
+            final File profileFile = new File(LibertyCity.getInstance().getDataFolder() + "/data/", uuid + ".ASCII");
+
             final FileInputStream fileIn = new FileInputStream(profileFile.getPath());
             final ObjectInputStream in = new ObjectInputStream(fileIn);
+
             LibertyCity.getInstance().getProfileManager().getProfileMap().put(uuid, (Profile) in.readObject());
 
-            in.close();
             fileIn.close();
-
-        } catch (final IOException | ClassNotFoundException ignored) {
-
-        }
+            in.close();
+        } catch (final IOException | ClassNotFoundException ignored) {}
     }
 
-    public static boolean profileExists(UUID uuid) {
-        final File profileFile = new File(LibertyCity.getInstance().getDataFolder() + "/data/", uuid + ".ASCII");
-
-        return profileFile.exists();
+    public static boolean profileExists(final UUID uuid) {
+        return new File(LibertyCity.getInstance().getDataFolder() + "/data/", uuid + ".ASCII").exists();
     }
 
     public static void log(final String message, final String customFolderPath, final String customFilePath) {
@@ -83,7 +78,7 @@ public class FileManager {
             final String logTime = TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG);
 
             File fileFolder = new File(LibertyCity.getInstance().getDataFolder() + "/logs/");
-            File logFile = new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + logDate + ".log");
+            File logFile = new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG_DATE) + ".log");
 
             if (customFolderPath != null) fileFolder = new File(LibertyCity.getInstance().getDataFolder() + customFolderPath);
             if (customFilePath != null) logFile = new File(LibertyCity.getInstance().getDataFolder() + customFilePath);
@@ -100,12 +95,12 @@ public class FileManager {
 
             try {
 
-                PrintWriter pw = new PrintWriter(new FileWriter(logFile));
+                final FileWriter writer = new FileWriter(logFile, true);
 
-                pw.println(logTime + ": " + output + System.lineSeparator());
-                pw.println("poussay");
+                writer.append(logTime).append(": ").append(output).append(System.lineSeparator());
 
-                pw.close();
+                writer.flush();
+                writer.close();
             } catch (final IOException e) {
                 e.printStackTrace();
             }
@@ -117,11 +112,11 @@ public class FileManager {
 
         try {
 
-            FileOutputStream fos = new FileOutputStream(pathOut.toString());
-            ZipOutputStream zipOut = new ZipOutputStream(fos);
+            final FileOutputStream fos = new FileOutputStream(pathOut.toString());
+            final ZipOutputStream zipOut = new ZipOutputStream(fos);
 
-            FileInputStream fis = new FileInputStream(pathIn);
-            ZipEntry zipEntry = new ZipEntry(pathIn.getName());
+            final FileInputStream fis = new FileInputStream(pathIn);
+            final ZipEntry zipEntry = new ZipEntry(pathIn.getName());
             zipOut.putNextEntry(zipEntry);
 
             byte[] bytes = new byte[1024];
@@ -142,13 +137,5 @@ public class FileManager {
 
             e.printStackTrace();
         }
-    }
-
-    public static File getLogFile() {
-        return logFile;
-    }
-
-    public static YamlConfiguration getCfg() {
-        return cfg;
     }
 }
