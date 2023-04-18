@@ -13,7 +13,6 @@ import com.xiii.libertycity.roleplay.utils.NameConverter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -44,24 +43,26 @@ public class HandcuffsHandle extends ItemUtils implements Data {
 
                         if (targetProfile.isHandcuffed) {
 
-                            ((Player) target).sendTitle("§a§lVOUS AVEZ ÉTÉ LIBÉRÉ", "§a" + NameConverter.getFullName(player) + "§7 vous a libéré.", 0, 20*3, 20);
                             targetProfile.isHandcuffed = false;
                             targetProfile.handcuffedBy = null;
+
                             Bukkit.getScheduler().cancelTask(handcuffDelayTask.getTaskId());
                             Bukkit.getScheduler().cancelTask(teleportTask.getTaskId());
                             handcuffDelayTask = null;
                             teleportTask = null;
+
+                            ((Player) target).sendTitle("§a§lVOUS AVEZ ÉTÉ LIBÉRÉ", "§a" + NameConverter.getFullName(player) + "§7 vous a libéré.", 0, 20*3, 20);
                             ChatUtils.multicast("§aVous avez libéré §e" + NameConverter.getFullName((Player) target) + "§a!", player);
                             ChatUtils.multicast("§aVous avez été libéré par §e" + NameConverter.getFullName(player), (Player) target);
                         } else {
 
-                            ((Player) target).sendTitle("§c§LVOUS ÊTES MENOTTÉ", "§7Veuillez coopérer avec §c" + NameConverter.getFullName(player), 0, 20*86400, 0);
                             targetProfile.isHandcuffed = true;
                             targetProfile.handcuffedBy = player;
+
+                            ((Player) target).sendTitle("§c§LVOUS ÊTES MENOTTÉ", "§7Veuillez coopérer avec §c" + NameConverter.getFullName(player), 0, 20*86400, 0);
                             ChatUtils.multicast("§cVous avez menotté §e" + NameConverter.getFullName((Player) target) + "§c!", player);
                             ChatUtils.multicast("§cVous avez été menotté par §e" + NameConverter.getFullName(player), (Player) target);
                         }
-                        return;
                     }
                 }
             }
@@ -75,40 +76,58 @@ public class HandcuffsHandle extends ItemUtils implements Data {
             if (profile.isHandcuffed) {
 
                 packet.getEvent().setCancelled(true);
+
                 if (teleportTask == null && profile.handcuffedBy != null) {
+
                     teleportTask = new BukkitRunnable() {
+
                         @Override
                         public void run() {
                             player.teleport(player);
                         }
                     }.runTaskTimer(LibertyCity.getInstance(), 3L, 3L);
                 }
-                if (handcuffDelayTask == null && profile.handcuffedBy != null) {
+
+                if (handcuffDelayTask == null && profile.handcuffedBy != null && profile.isHandcuffed) {
+
                     handcuffDelayTask = new BukkitRunnable() {
+
                         @Override
                         public void run() {
-                            assert profile.isHandcuffed;
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§c§lVous ne pouvez pas bouger, vous êtes menotté!"));
-                            if (Math.abs(profile.handcuffedBy.getLocation().distance(player.getLocation())) >= 8) {
-                                if (profile.handcuffedDelay >= 30) {
-                                    profile.isHandcuffed = false;
-                                    profile.handcuffedDelay = 0;
-                                    profile.handcuffedBy.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§4§lLe suspect menotté c'est échappé!"));
-                                    profile.handcuffedBy = null;
-                                    player.sendTitle("§a§lVOUS AVEZ ÉTÉ LIBÉRÉ", "§7Le policier est resté trop loin! Échappez-vous!", 0, 20 * 3, 20);
-                                    Bukkit.getScheduler().cancelTask(handcuffDelayTask.getTaskId());
-                                    Bukkit.getScheduler().cancelTask(teleportTask.getTaskId());
-                                    handcuffDelayTask = null;
-                                    teleportTask = null;
+
+                            if (profile.isHandcuffed && profile.handcuffedBy != null) {
+
+                                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§c§lVous ne pouvez pas bouger, vous êtes menotté!"));
+
+                                if (Math.abs(profile.handcuffedBy.getLocation().distance(player.getLocation())) >= 8) {
+
+                                    if (profile.handcuffedDelay >= 30) {
+
+                                        profile.handcuffedBy.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§4§lLe suspect menotté c'est échappé!"));
+                                        ChatUtils.multicast("§cLe suspect menotté c'est échappé!", profile.handcuffedBy);
+                                        player.sendTitle("§a§lVOUS AVEZ ÉTÉ LIBÉRÉ", "§7Le policier est resté trop loin! Échappez-vous!", 0, 20 * 3, 20);
+
+                                        profile.isHandcuffed = false;
+                                        profile.handcuffedDelay = 0;
+                                        profile.handcuffedBy = null;
+
+                                        Bukkit.getScheduler().cancelTask(handcuffDelayTask.getTaskId());
+                                        Bukkit.getScheduler().cancelTask(teleportTask.getTaskId());
+                                        handcuffDelayTask = null;
+                                        teleportTask = null;
+                                    } else {
+
+                                        profile.handcuffedDelay++;
+                                        player.sendTitle("§c§lVOUS ÊTES MENOTTÉ", "§7Vous pourrez vous échappez dans §c" + (30 - profile.handcuffedDelay) + " secondes§7...", 0, 20 * 3, 20);
+                                        profile.handcuffedBy.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§4§lVous vous éloignez du suspect menotté!"));
+                                    }
                                 } else {
-                                    profile.handcuffedDelay++;
-                                    player.sendTitle("§c§lVOUS ÊTES MENOTTÉ", "§7Vous pourrez vous échappez dans §c" + (30 - profile.handcuffedDelay) + " secondes§7...", 0, 20 * 3, 20);
-                                    profile.handcuffedBy.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§4§lVous vous éloignez du suspect menotté!"));
-                                }
-                            } else {
-                                if (profile.handcuffedDelay > 0) {
-                                    profile.handcuffedDelay--;
-                                    player.sendTitle("§c§LVOUS ÊTES MENOTTÉ", "§7Veuillez coopérer avec §c" + NameConverter.getFullName(profile.handcuffedBy), 0, 20*86400, 0);
+
+                                    if (profile.handcuffedDelay > 0) {
+
+                                        profile.handcuffedDelay--;
+                                        player.sendTitle("§c§LVOUS ÊTES MENOTTÉ", "§7Veuillez coopérer avec §c" + NameConverter.getFullName(profile.handcuffedBy), 0, 20 * 86400, 0);
+                                    }
                                 }
                             }
                         }

@@ -33,11 +33,15 @@ public class SearchHandle extends ItemUtils implements Data {
 
                         final Profile targetProfile = LibertyCity.getInstance().getProfileManager().getProfile(target.getUniqueId());
                         final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
+
                         targetProfile.isSearched = true;
+                        targetProfile.searchedBy = player;
+
                         profile.isSearching = true;
                         profile.searchingWho = (Player) target;
-                        targetProfile.searchedBy = player;
+
                         player.openInventory(InvSee.invSee((Player) target));
+
                         ChatUtils.multicast("§cVous fouillez §e" + NameConverter.getFullName((Player) target) + "§c!", player);
                         ChatUtils.multicast("§cVous vous faites fouillez par §e" + NameConverter.getFullName(player) + "§c!", (Player) target);
                     }
@@ -56,6 +60,7 @@ public class SearchHandle extends ItemUtils implements Data {
 
                 targetProfile.isSearching = false;
                 targetProfile.searchedBy = null;
+
                 profile.isSearching = false;
 
                 ChatUtils.multicast("§aVous avez libéré §e" + profile.searchingWho.getName() + "§a!", player);
