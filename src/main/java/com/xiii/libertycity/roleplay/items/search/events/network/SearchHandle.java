@@ -33,26 +33,13 @@ public class SearchHandle extends ItemUtils implements Data {
 
                         final Profile targetProfile = LibertyCity.getInstance().getProfileManager().getProfile(target.getUniqueId());
                         final Profile profile = LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId());
-
-                        if (targetProfile.isSearched) {
-
-                            targetProfile.isSearched = false;
-                            profile.isSearching = false;
-                            profile.searchingWho = null;
-                            targetProfile.searchedBy.closeInventory();
-                            targetProfile.searchedBy = null;
-                            ChatUtils.multicast("§aVous avez libéré §e" + NameConverter.getFullName((Player) target) + "§a!", player);
-                            ChatUtils.multicast("§aVous avez été libéré par §e" + NameConverter.getFullName(player) + "§a!", (Player) target);
-                        } else {
-
-                            targetProfile.isSearched = true;
-                            profile.isSearching = true;
-                            profile.searchingWho = (Player) target;
-                            targetProfile.searchedBy = player;
-                            player.openInventory(InvSee.invSee((Player) target));
-                            ChatUtils.multicast("§cVous fouillez §e" + NameConverter.getFullName((Player) target) + "§c!", player);
-                            ChatUtils.multicast("§cVous vous faites fouillez par §e" + NameConverter.getFullName(player) + "§c!", (Player) target);
-                        }
+                        targetProfile.isSearched = true;
+                        profile.isSearching = true;
+                        profile.searchingWho = (Player) target;
+                        targetProfile.searchedBy = player;
+                        player.openInventory(InvSee.invSee((Player) target));
+                        ChatUtils.multicast("§cVous fouillez §e" + NameConverter.getFullName((Player) target) + "§c!", player);
+                        ChatUtils.multicast("§cVous vous faites fouillez par §e" + NameConverter.getFullName(player) + "§c!", (Player) target);
                     }
                 }
             }
@@ -81,6 +68,5 @@ public class SearchHandle extends ItemUtils implements Data {
     }
 
 
-    public void handle(final ServerPlayPacket packet) {
-    }
+    public void handle(final ServerPlayPacket packet) {}
 }
