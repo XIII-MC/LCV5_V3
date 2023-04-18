@@ -87,7 +87,7 @@ public final class LibertyCity extends JavaPlugin {
         //Tasks
         log(Level.INFO, "Starting tasks...");
         new TickTask(this).runTaskTimerAsynchronously(this, 50L, 0L);
-        new LogExportTask().runTaskTimer(this, 20*10, 20*10);
+        //new LogExportTask().runTaskTimer(this, 20*10, 20*10);
         new ClearLagTask(this).runTaskTimerAsynchronously(this, 20*1800, 20*1800);
 
         //Bukkit Listeners
@@ -132,11 +132,13 @@ public final class LibertyCity extends JavaPlugin {
         FileManager.saveProfile(this.getServerProfile());
 
         //Save log file
+        /*
         try {
             FileManager.getCfg().save(FileManager.getLogFile());
         } catch (IOException e) {
             e.printStackTrace();
         }
+         */
 
         //Shutdown all managers
         this.profileManager.shutdown();

@@ -98,7 +98,18 @@ public class FileManager {
                 }
             }
 
-            getCfg().set(logTime, output);
+            try {
+
+                PrintWriter pw = new PrintWriter(new FileWriter(logFile));
+
+                pw.println(logTime + ": " + output + System.lineSeparator());
+                pw.println("poussay");
+
+                pw.close();
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+
         });
     }
 
