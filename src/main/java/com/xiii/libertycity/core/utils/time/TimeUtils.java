@@ -28,4 +28,11 @@ public class TimeUtils {
     public static Date getDate(final long millis) {
         return new Date(millis);
     }
+
+    public static String getLogTime(final long millis) {
+        int seconds = (int) (millis / 1000) % 60 ;
+        int minutes = (int) ((millis / (1000*60)) % 60);
+        int hours = (int) ((millis / (1000*60*60)) % 24);
+        return hours + ":" + minutes + ":" + seconds;
+    }
 }

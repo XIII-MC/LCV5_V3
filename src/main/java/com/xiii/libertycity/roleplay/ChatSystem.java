@@ -59,7 +59,7 @@ public class ChatSystem implements Data {
 
             Bukkit.getOnlinePlayers().stream().filter(p -> LibertyCity.getInstance().getProfileManager().getProfile(p.getUniqueId()).spyChat == getChatType() || LibertyCity.getInstance().getProfileManager().getProfile(p.getUniqueId()).spyGlobal).forEach(p -> ChatUtils.multicast("§c§l[CS]§8 | " + getChatFormat(), p));
             Bukkit.getOnlinePlayers().stream().filter(p -> LibertyCity.getInstance().getProfileManager().getProfile(p.getUniqueId()).rpChat == getChatType()).forEach(p -> ChatUtils.multicast(getChatFormat(), p));
-            FileManager.log(getChatFormat(), null, null);
+            FileManager.log(getChatFormat());
         }
     }
 

@@ -6,14 +6,19 @@ import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class FileManager {
+
+    private static final List<String> cachedMessages = new ArrayList<>();
+    private static final File fileFolder = new File(LibertyCity.getInstance().getDataFolder() + "/logs/"),
+            logFile = new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG_DATE) + ".log");
 
     public static void saveProfile(final Profile profile) {
 
@@ -67,45 +72,8 @@ public class FileManager {
         return new File(LibertyCity.getInstance().getDataFolder() + "/data/", uuid + ".ASCII").exists();
     }
 
-    public static void log(final String message, final String customFolderPath, final String customFilePath) {
-
-        LibertyCity.getInstance().getThread().execute(() -> {
-
-            final Pattern pt = Pattern.compile("\\§+.");
-            final Matcher match = pt.matcher(message);
-            final String output = match.replaceAll("");
-
-            final String logTime = TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG);
-
-            File fileFolder = new File(LibertyCity.getInstance().getDataFolder() + "/logs/");
-            File logFile = new File(LibertyCity.getInstance().getDataFolder() + "/logs/" + TimeUtils.convertMillis(System.currentTimeMillis(), TimeFormat.LOG_DATE) + ".log");
-
-            if (customFolderPath != null) fileFolder = new File(LibertyCity.getInstance().getDataFolder() + customFolderPath);
-            if (customFilePath != null) logFile = new File(LibertyCity.getInstance().getDataFolder() + customFilePath);
-
-            if (!fileFolder.exists()) fileFolder.mkdir();
-
-            if (!logFile.exists()) {
-                try {
-                    logFile.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            try {
-
-                final FileWriter writer = new FileWriter(logFile, true);
-
-                writer.append(logTime).append(": ").append(output).append(System.lineSeparator());
-
-                writer.flush();
-                writer.close();
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-
-        });
+    public static void log(final String message) {
+        LibertyCity.getInstance().getThread().execute(() -> cachedMessages.add(TimeUtils.getLogTime(System.currentTimeMillis()) + ": " + message.replaceAll("§+.", "")));
     }
 
     public static void zipFile(final File pathIn, final File pathOut) {
@@ -137,5 +105,26 @@ public class FileManager {
 
             e.printStackTrace();
         }
+    }
+
+    public static void initialize() {
+
+        if (!fileFolder.exists()) fileFolder.mkdir();
+
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static List<String> getCachedMessages() {
+        return cachedMessages;
+    }
+
+    public static File getLogFile() {
+        return logFile;
     }
 }

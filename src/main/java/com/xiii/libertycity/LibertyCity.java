@@ -10,6 +10,7 @@ import com.xiii.libertycity.core.manager.threads.ProfileThread;
 import com.xiii.libertycity.core.manager.threads.ThreadManager;
 import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
 import com.xiii.libertycity.core.processors.network.NetworkListener;
+import com.xiii.libertycity.core.tasks.LogExportTask;
 import com.xiii.libertycity.core.tasks.TickTask;
 import com.xiii.libertycity.core.tasks.clearlag.ClearLagTask;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
@@ -67,6 +68,8 @@ public final class LibertyCity extends JavaPlugin {
         logger = this.getLogger();
         pdf = this.getDescription();
 
+        FileManager.initialize();
+
         if (FileManager.profileExists(this.getServerUUID())) FileManager.readProfile(this.getServerUUID());
         this.getProfileManager().createProfile(this.getServerUUID());
         this.getProfileManager().getProfile(this.getServerUUID()).serverInitialize();
@@ -86,6 +89,7 @@ public final class LibertyCity extends JavaPlugin {
         log(Level.INFO, "Starting tasks...");
         new TickTask(this).runTaskTimerAsynchronously(this, 50L, 0L);
         new ClearLagTask(this).runTaskTimerAsynchronously(this, 20*1800, 20*1800);
+        new LogExportTask().runTaskTimerAsynchronously(this, 20*5, 20*5);
 
         //Bukkit Listeners
         log(Level.INFO, "Starting listeners...");
