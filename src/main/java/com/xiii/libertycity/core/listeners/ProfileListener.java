@@ -5,6 +5,7 @@ import com.xiii.libertycity.core.enums.MsgType;
 import com.xiii.libertycity.core.manager.files.FileManager;
 import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.utils.ChatUtils;
+import com.xiii.libertycity.core.utils.TabListUtils;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -36,6 +37,8 @@ public class ProfileListener implements Listener {
 
                 profile.initialize(player);
             } else RegisterEvent.initialize(player);
+
+            TabListUtils.emptyTabList(player);
 
             this.plugin.getProfileManager().createProfile(player);
 
