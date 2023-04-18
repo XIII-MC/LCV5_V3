@@ -46,10 +46,8 @@ public class HandcuffsHandle extends ItemUtils implements Data {
                             targetProfile.isHandcuffed = false;
                             targetProfile.handcuffedBy = null;
 
-                            Bukkit.getScheduler().cancelTask(handcuffDelayTask.getTaskId());
-                            Bukkit.getScheduler().cancelTask(teleportTask.getTaskId());
-                            handcuffDelayTask = null;
-                            teleportTask = null;
+                            if (handcuffDelayTask != null) Bukkit.getScheduler().cancelTask(handcuffDelayTask.getTaskId());
+                            if (teleportTask != null) Bukkit.getScheduler().cancelTask(teleportTask.getTaskId());
 
                             ((Player) target).sendTitle("§a§lVOUS AVEZ ÉTÉ LIBÉRÉ", "§a" + NameConverter.getFullName(player) + "§7 vous a libéré.", 0, 20*3, 20);
                             ChatUtils.multicast("§aVous avez libéré §e" + NameConverter.getFullName((Player) target) + "§a!", player);
@@ -83,7 +81,7 @@ public class HandcuffsHandle extends ItemUtils implements Data {
 
                         @Override
                         public void run() {
-                            player.teleport(player);
+                            if (profile.isHandcuffed && profile.handcuffedBy != null) player.teleport(player);
                         }
                     }.runTaskTimer(LibertyCity.getInstance(), 3L, 3L);
                 }
@@ -111,10 +109,8 @@ public class HandcuffsHandle extends ItemUtils implements Data {
                                         profile.handcuffedDelay = 0;
                                         profile.handcuffedBy = null;
 
-                                        Bukkit.getScheduler().cancelTask(handcuffDelayTask.getTaskId());
-                                        Bukkit.getScheduler().cancelTask(teleportTask.getTaskId());
-                                        handcuffDelayTask = null;
-                                        teleportTask = null;
+                                        if (handcuffDelayTask != null) Bukkit.getScheduler().cancelTask(handcuffDelayTask.getTaskId());
+                                        if (teleportTask != null) Bukkit.getScheduler().cancelTask(teleportTask.getTaskId());
                                     } else {
 
                                         profile.handcuffedDelay++;
