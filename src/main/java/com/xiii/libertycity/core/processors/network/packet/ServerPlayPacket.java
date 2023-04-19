@@ -2,6 +2,7 @@ package com.xiii.libertycity.core.processors.network.packet;
 
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
 import org.bukkit.entity.Player;
 
 public class ServerPlayPacket {
@@ -14,12 +15,23 @@ public class ServerPlayPacket {
     private final Player player;
     private final PacketPlaySendEvent packetEvent;
 
+    /*
+    TabList - Header & Footer
+     */
+    private WrapperPlayServerPlayerListHeaderAndFooter tabList;
+
     public ServerPlayPacket(PacketType.Play.Server packet, PacketPlaySendEvent e, long timeStamp) {
         this.timeStamp = timeStamp;
         this.player = (Player) e.getPlayer();
         this.packetEvent = e;
 
         switch (this.packet = packet) {
+
+            case PLAYER_LIST_HEADER_AND_FOOTER:
+
+                this.tabList = new WrapperPlayServerPlayerListHeaderAndFooter(e);
+
+                break;
         }
 
     }
@@ -38,5 +50,9 @@ public class ServerPlayPacket {
 
     public PacketPlaySendEvent getEvent() {
         return packetEvent;
+    }
+
+    public WrapperPlayServerPlayerListHeaderAndFooter getTabList() {
+        return tabList;
     }
 }

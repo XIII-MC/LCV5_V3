@@ -13,6 +13,5 @@ import org.bukkit.entity.Player;
 public final class TabListUtils {
 
     public static void emptyTabList(final Player player) {
-        LibertyCity.getInstance().getTabInstance().newTableTabList(player, 1, 1, 1);
     }
 }
