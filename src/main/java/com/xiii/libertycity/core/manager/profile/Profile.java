@@ -5,7 +5,9 @@ import com.xiii.libertycity.core.manager.threads.ProfileThread;
 import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.roleplay.ChatSystem;
+import com.xiii.libertycity.roleplay.events.network.HitBoxCheck;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
+import com.xiii.libertycity.roleplay.events.network.TabListEvent;
 import com.xiii.libertycity.roleplay.guis.atm.events.network.ATMHandle;
 import com.xiii.libertycity.roleplay.guis.trashcan.events.network.TrashcanHandle;
 import com.xiii.libertycity.roleplay.items.handcuffs.events.network.HandcuffsHandle;
@@ -39,6 +41,8 @@ public class Profile implements java.io.Serializable {
     private transient IDCardHandle idCardHandle;
     private transient HandcuffsHandle handcuffsHandle;
     private transient SearchHandle searchHandle;
+    private transient TabListEvent tabListEvent;
+    private transient HitBoxCheck hitBoxCheck;
     //------------------------------------
     public String rpFirstName;
     public String rpLastName;
@@ -71,6 +75,8 @@ public class Profile implements java.io.Serializable {
     public transient boolean isSearched;
     public transient boolean isSearching;
     public transient int handcuffedDelay;
+    public transient String temp_rpFirstName, temp_rpLastName, temp_rpAge;
+    public transient boolean awaitResponse_rpFirstName, awaitResponse_rpLastName, awaitResponse_rpAge;
 
     public Profile(final UUID uuid) {
         this.playerUUID = uuid;
@@ -95,6 +101,8 @@ public class Profile implements java.io.Serializable {
         this.idCardHandle = new IDCardHandle();
         this.handcuffsHandle = new HandcuffsHandle();
         this.searchHandle = new SearchHandle();
+        this.tabListEvent = new TabListEvent();
+        this.hitBoxCheck = new HitBoxCheck();
     }
 
     public void serverInitialize() {
@@ -115,13 +123,16 @@ public class Profile implements java.io.Serializable {
         this.idCardHandle.handle(packet);
         this.handcuffsHandle.handle(packet);
         this.searchHandle.handle(packet);
+        this.tabListEvent.handle(packet);
+        this.hitBoxCheck.handle(packet);
     }
 
     public void handleServerNetty(final ServerPlayPacket packet) {
 
-        if (this.walletHandle == null) return;
+        if (this.walletHandle == null || this.tabListEvent == null) return;
 
         this.walletHandle.handle(packet);
+        this.tabListEvent.handle(packet);
     }
 
     public void handleClient(final ClientPlayPacket packet) {
