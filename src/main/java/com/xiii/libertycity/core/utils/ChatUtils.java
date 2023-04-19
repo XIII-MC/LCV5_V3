@@ -34,10 +34,7 @@ public final class ChatUtils {
 
             final WrapperPlayServerChatMessage packet = new WrapperPlayServerChatMessage(chatMessage);
 
-            for (Player player : players) {
-
-                if (LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).isVerified) PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getPlayerManager().getChannel(player), packet);
-            }
+            BetterStream.filter(players, player -> LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).isVerified).forEach(player -> PacketEvents.getAPI().getProtocolManager().sendPacket(PacketEvents.getAPI().getPlayerManager().getChannel(player), packet));
         });
     }
 }
