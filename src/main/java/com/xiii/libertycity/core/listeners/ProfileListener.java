@@ -7,6 +7,7 @@ import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.core.utils.TabListUtils;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
+import com.xiii.libertycity.roleplay.utils.NameTags;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,8 @@ public class ProfileListener implements Listener {
             } else RegisterEvent.initialize(player);
 
             TabListUtils.emptyTabList(player);
+
+            NameTags.hideNameTag(player);
 
             this.plugin.getProfileManager().createProfile(player);
 
