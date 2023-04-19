@@ -5,7 +5,6 @@ import com.xiii.libertycity.core.manager.threads.ProfileThread;
 import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
 import com.xiii.libertycity.roleplay.ChatSystem;
-import com.xiii.libertycity.roleplay.events.network.HitBoxCheck;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
 import com.xiii.libertycity.roleplay.events.network.TabListEvent;
 import com.xiii.libertycity.roleplay.guis.atm.events.network.ATMHandle;
@@ -42,7 +41,6 @@ public class Profile implements java.io.Serializable {
     private transient HandcuffsHandle handcuffsHandle;
     private transient SearchHandle searchHandle;
     private transient TabListEvent tabListEvent;
-    private transient HitBoxCheck hitBoxCheck;
     //------------------------------------
     public String rpFirstName;
     public String rpLastName;
@@ -102,7 +100,6 @@ public class Profile implements java.io.Serializable {
         this.handcuffsHandle = new HandcuffsHandle();
         this.searchHandle = new SearchHandle();
         this.tabListEvent = new TabListEvent();
-        this.hitBoxCheck = new HitBoxCheck();
     }
 
     public void serverInitialize() {
@@ -124,7 +121,6 @@ public class Profile implements java.io.Serializable {
         this.handcuffsHandle.handle(packet);
         this.searchHandle.handle(packet);
         this.tabListEvent.handle(packet);
-        this.hitBoxCheck.handle(packet);
     }
 
     public void handleServerNetty(final ServerPlayPacket packet) {
