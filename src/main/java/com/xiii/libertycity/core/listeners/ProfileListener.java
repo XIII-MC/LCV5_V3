@@ -24,7 +24,7 @@ public class ProfileListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent e) {
         LibertyCity.getInstance().getThread().execute(() -> {
 
@@ -50,7 +50,7 @@ public class ProfileListener implements Listener {
         e.setJoinMessage("");
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLeave(PlayerQuitEvent e) {
         LibertyCity.getInstance().getThread().execute(() -> {
 
@@ -64,6 +64,8 @@ public class ProfileListener implements Listener {
             this.plugin.getBossBar().removePlayer(player);
 
             this.plugin.getProfileManager().removeProfile(player.getUniqueId());
+
+            profile.timerTask.cancel();
 
             this.plugin.getThreadManager().removeProfile(player.getUniqueId());
 

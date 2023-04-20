@@ -8,11 +8,12 @@ import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.manager.profile.ProfileManager;
 import com.xiii.libertycity.core.manager.threads.ProfileThread;
 import com.xiii.libertycity.core.manager.threads.ThreadManager;
+import com.xiii.libertycity.core.manager.threads.ThreadMonitor;
 import com.xiii.libertycity.core.processors.bukkit.BukkitListener;
 import com.xiii.libertycity.core.processors.network.NetworkListener;
 import com.xiii.libertycity.core.tasks.LogExportTask;
-import com.xiii.libertycity.core.tasks.TickTask;
 import com.xiii.libertycity.core.tasks.clearlag.ClearLagTask;
+import com.xiii.libertycity.core.utils.TPS;
 import com.xiii.libertycity.core.utils.time.TimeFormat;
 import com.xiii.libertycity.core.utils.time.TimeUtils;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -24,10 +25,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,8 +85,8 @@ public final class LibertyCity extends JavaPlugin {
 
         //Tasks
         log(Level.INFO, "Starting tasks...");
-        new TickTask(this).runTaskTimerAsynchronously(this, 50L, 0L);
         new ClearLagTask(this).runTaskTimerAsynchronously(this, 20*1800, 20*1800);
+        new ThreadMonitor().runTaskTimerAsynchronously(this, 0L, 20*10);
         new LogExportTask().runTaskTimerAsynchronously(this, 20*5, 20*5);
 
         //Bukkit Listeners
@@ -184,5 +182,13 @@ public final class LibertyCity extends JavaPlugin {
 
     public Profile getServerProfile() {
         return this.getProfileManager().getProfile(this.getServerUUID());
+    }
+
+    public double getTPS() {
+        return TPS.getTPS();
+    }
+
+    public double getAverageTPS(final int time) {
+        return TPS.getAverageTPS(time);
     }
 }

@@ -7,10 +7,7 @@ import com.xiii.libertycity.core.utils.MathUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class ThreadManager implements Listener, Initializer {
@@ -79,5 +76,9 @@ public class ThreadManager implements Listener, Initializer {
         this.profileThreads.forEach(ProfileThread::shutdownThread);
 
         this.profileThreads.clear();
+    }
+
+    public List<ProfileThread> getProfileThreads() {
+        return profileThreads;
     }
 }

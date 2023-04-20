@@ -1,81 +1,61 @@
 package com.xiii.libertycity.core.tasks;
 
-import com.xiii.libertycity.LibertyCity;
+import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.utils.MathUtils;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class TickTask extends BukkitRunnable {
+import java.util.TimerTask;
 
-    private final LibertyCity plugin;
+public class TickTask extends TimerTask {
 
-    public TickTask(LibertyCity plugin) {
-        this.plugin = plugin;
+    private final Profile profile;
+
+    public TickTask(Profile profile) {
+        this.profile = profile;
     }
 
-    private static int ticks;
-    private static double tps = 20.0D;
-    private static long tickTime, lastLagSpike;
-    private int tpsTicks = 20;
-    private long lastTime = System.currentTimeMillis();
-    private long currentSec;
-
-    @Override
     public void run() {
 
-        //Increment tick
-        ticks++;
+        this.profile.getProfileThread().execute(() -> {
 
-        //Get the current system time
-        final long currentTime = System.currentTimeMillis();
+            //Increment tick
+            this.profile.ticks++;
 
-        //Handle server TPS and tick time
-        server:
-        {
+            //Get the current system time
+            final long currentTime = System.currentTimeMillis();
 
-            //The server's probably laggy at this early stage
-            if (ticks < 100) break server;
+            //Handle server TPS and tick time
+            server:
+            {
 
-            tickTime = currentTime - this.lastTime;
+                //The server's probably laggy at this early stage
+                if (this.profile.ticks < 100) break server;
 
-            this.lastTime = currentTime;
+                this.profile.tickTime = currentTime - this.profile.lastTime;
 
-            final long sec = (currentTime / 1000L);
+                this.profile.lastTime = currentTime;
 
-            if (this.currentSec == sec) {
+                final long sec = (currentTime / 1000L);
 
-                this.tpsTicks++;
+                if (this.profile.currentSec == sec) {
 
-            } else {
+                    this.profile.tpsTicks++;
 
-                this.currentSec = sec;
+                } else {
 
-                tps = Math.min(MathUtils.decimalRound((tps + this.tpsTicks) / 2.0D, 2), 20.0D);
+                    this.profile.currentSec = sec;
 
-                this.tpsTicks = 1;
+                    this.profile.tps = Math.min(MathUtils.decimalRound((this.profile.tps + this.profile.tpsTicks) / 2.0D, 2), 20.0D);
+
+                    this.profile.tpsTicks = 1;
+                }
+
+                //Handle lag spikes
+                if (this.profile.tickTime >= 1050L
+                        || this.profile.tps <= 14.5) {
+
+                    this.profile.lastLagSpike = currentTime;
+                }
             }
-
-            //Handle lag spikes
-            if (tickTime >= 1050L
-                    || tps <= 14.5) {
-
-                lastLagSpike = currentTime;
-            }
-        }
-    }
-
-    public static double getTPS() {
-        return tps;
-    }
-
-    public static int getCurrentTick() {
-        return Math.abs(ticks);
-    }
-
-    public static long getTickTime() {
-        return tickTime;
-    }
-
-    public static long getLastLagSpike() {
-        return MathUtils.elapsed(lastLagSpike);
+        });
     }
 }

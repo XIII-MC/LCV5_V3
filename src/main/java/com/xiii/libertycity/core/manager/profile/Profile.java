@@ -4,6 +4,7 @@ import com.xiii.libertycity.LibertyCity;
 import com.xiii.libertycity.core.manager.threads.ProfileThread;
 import com.xiii.libertycity.core.processors.network.packet.ClientPlayPacket;
 import com.xiii.libertycity.core.processors.network.packet.ServerPlayPacket;
+import com.xiii.libertycity.core.tasks.TickTask;
 import com.xiii.libertycity.roleplay.ChatSystem;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
 import com.xiii.libertycity.roleplay.events.network.TabListEvent;
@@ -16,12 +17,19 @@ import com.xiii.libertycity.roleplay.items.wallet.events.network.WalletHandle;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
+import java.util.Timer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Profile implements java.io.Serializable {
     private static final long serialVersionUID = 5306742032478905396L;
 
+    //--------PERFORMANCE MONITOR--------
+    public transient Timer timerTask;
+    public transient double tps = 20.1D;
+    public transient int ticks, tpsTicks;
+    public transient long tickTime, lastLagSpike, currentSec;
+    public transient long lastTime = System.currentTimeMillis();
     //----------------SERVER--------------
     public Map<String, UUID> db_rpFirstName;
     public Map<String, UUID> db_rpLastName;
@@ -50,8 +58,6 @@ public class Profile implements java.io.Serializable {
     public int rpChat; // 0=HRP 1=RP 2=POLICE 3=GANG 4=STAFF
     public String policeRank;
     public String gangName;
-    public transient boolean spyGlobal = false;
-    public transient int spyChat = -1; // 0=HRP 1=RP 2=POLICE 3=GANG
     public String encryptedIDCardID;
     public String phoneNumber;
 
@@ -66,15 +72,11 @@ public class Profile implements java.io.Serializable {
     public long rpBankCurrWit = 0;
 
     //Temp
-    public transient Player handcuffedBy;
-    public transient Player searchedBy;
-    public transient Player searchingWho;
-    public transient boolean isHandcuffed;
-    public transient boolean isSearched;
-    public transient boolean isSearching;
-    public transient int handcuffedDelay;
+    public transient Player handcuffedBy, searchedBy, searchingWho;
+    public transient boolean isHandcuffed, isSearched, isSearching;
+    public transient int handcuffedDelay, spyChat = -1;
     public transient String temp_rpFirstName, temp_rpLastName, temp_rpAge;
-    public transient boolean awaitResponse_rpFirstName, awaitResponse_rpLastName, awaitResponse_rpAge;
+    public transient boolean awaitResponse_rpFirstName, awaitResponse_rpLastName, awaitResponse_rpAge, spyGlobal = false;
 
     public Profile(final UUID uuid) {
         this.playerUUID = uuid;
@@ -89,6 +91,8 @@ public class Profile implements java.io.Serializable {
         this.playerName = player.getName();
         this.playerEntity = player.getPlayer();
         this.profileThread = LibertyCity.getInstance().getThreadManager().getAvailableProfileThread();
+        this.timerTask = new Timer();
+        this.profileThread.execute(() -> this.timerTask.scheduleAtFixedRate(new TickTask(this), 50L, 50L));
         LibertyCity.getInstance().getBossBar().addPlayer(player);
 
         this.registerEvent = new RegisterEvent();
@@ -107,6 +111,8 @@ public class Profile implements java.io.Serializable {
         if (this.db_rpLastName == null) this.db_rpLastName = new ConcurrentHashMap<>();
         if (this.db_phoneNumbers == null) this.db_phoneNumbers = new ConcurrentHashMap<>();
         this.profileThread = LibertyCity.getInstance().getThreadManager().getAvailableProfileThread();
+        this.timerTask = new Timer();
+        this.profileThread.execute(() -> this.timerTask.scheduleAtFixedRate(new TickTask(this), 50L, 50L));
         this.isVerified = true;
     }
 
