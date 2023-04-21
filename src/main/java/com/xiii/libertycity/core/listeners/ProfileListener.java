@@ -5,7 +5,6 @@ import com.xiii.libertycity.core.enums.MsgType;
 import com.xiii.libertycity.core.manager.files.FileManager;
 import com.xiii.libertycity.core.manager.profile.Profile;
 import com.xiii.libertycity.core.utils.ChatUtils;
-import com.xiii.libertycity.core.utils.TabListUtils;
 import com.xiii.libertycity.roleplay.events.network.RegisterEvent;
 import com.xiii.libertycity.roleplay.utils.NameTags;
 import org.bukkit.Bukkit;
@@ -39,8 +38,6 @@ public class ProfileListener implements Listener {
                 profile.initialize(player);
             } else RegisterEvent.initialize(player);
 
-            TabListUtils.emptyTabList(player);
-
             NameTags.hideNameTag(player);
 
             this.plugin.getProfileManager().createProfile(player);
@@ -52,11 +49,12 @@ public class ProfileListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLeave(PlayerQuitEvent e) {
-        LibertyCity.getInstance().getThread().execute(() -> {
 
-            final Player player = e.getPlayer();
+        final Player player = e.getPlayer();
 
-            final Profile profile = this.plugin.getProfileManager().getProfile(player.getUniqueId());
+        final Profile profile = this.plugin.getProfileManager().getProfile(player.getUniqueId());
+
+        profile.getProfileThread().execute(() -> {
 
             if (!profile.isVerified) RegisterEvent.shutdown(player);
             else FileManager.saveProfile(profile);
