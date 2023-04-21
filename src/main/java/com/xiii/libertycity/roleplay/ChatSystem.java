@@ -11,19 +11,9 @@ import com.xiii.libertycity.core.manager.threads.ThreadMonitor;
 import com.xiii.libertycity.core.utils.ChatUtils;
 import com.xiii.libertycity.roleplay.events.Data;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 public class ChatSystem implements Data {
-
-    //TEMP STRESS TEST
-    YamlConfiguration cfg = new YamlConfiguration();
-    List<String> msgCache = new ArrayList<>();
 
     private String chatFormat;
     private int chatType;
@@ -44,11 +34,6 @@ public class ChatSystem implements Data {
                 }
                 //server thread
                 LibertyCity.getInstance().getThread().execute(() -> ChatUtils.multicast("- server thread: §6TPS: " + LibertyCity.getInstance().getServerProfile().tps + "§8 | §3CPU: " + ThreadMonitor.getThreadUsage(Thread.currentThread().getId()) + "%" + " §7(" + (System.currentTimeMillis() - now) + "ms)", packet.getPlayer()));
-            }
-
-            if (packet.getChatWrapper().getMessage().equalsIgnoreCase("clear")) {
-                msgCache.clear();
-                return;
             }
 
             packet.getEvent().setCancelled(true);
@@ -90,18 +75,6 @@ public class ChatSystem implements Data {
             Bukkit.getOnlinePlayers().stream().filter(p -> LibertyCity.getInstance().getProfileManager().getProfile(p.getUniqueId()).spyChat == getChatType() || LibertyCity.getInstance().getProfileManager().getProfile(p.getUniqueId()).spyGlobal).forEach(p -> ChatUtils.multicast("§c§l[CS]§8 | " + getChatFormat(), p));
             Bukkit.getOnlinePlayers().stream().filter(p -> LibertyCity.getInstance().getProfileManager().getProfile(p.getUniqueId()).rpChat == getChatType()).forEach(p -> ChatUtils.multicast(getChatFormat(), p));
             FileManager.log(getChatFormat());
-
-            LibertyCity.getInstance().getThread().execute(() -> {
-                for (int i = 0; i < 999; i++) {
-                    msgCache.add(msgCache + getChatFormat());
-                    cfg.set(String.valueOf(Math.random() * 293), msgCache);
-                    try {
-                        cfg.save(new File(LibertyCity.getInstance().getDataFolder(), "/data/test.yml"));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
         }
     }
 
