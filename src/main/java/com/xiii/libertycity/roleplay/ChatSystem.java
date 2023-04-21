@@ -17,6 +17,7 @@ public class ChatSystem implements Data {
 
     private String chatFormat;
     private int chatType;
+    private float cpuUsage = 0f;
 
     public void handle(ClientPlayPacket packet) {
 
@@ -24,10 +25,12 @@ public class ChatSystem implements Data {
 
             if (packet.getChatWrapper().getMessage().equalsIgnoreCase("threads")) {
 
-                ChatUtils.multicast("Performance recap across " + LibertyCity.getInstance().getThreadManager().getProfileThreads().size() + " threads:", packet.getPlayer());
+                ChatUtils.multicast("Performance recap across " + ((LibertyCity.getInstance().getThreadManager().getProfileThreads().size()) + 2) + " threads:", packet.getPlayer());
                 final long now = System.currentTimeMillis();
+                Bukkit.getScheduler().runTask(LibertyCity.getInstance(), () -> cpuUsage = ThreadMonitor.getThreadUsage(Thread.currentThread().getId()));
                 //main thread
-                ChatUtils.multicast("- main thread: §6TPS: " + LibertyCity.getInstance().getTPS() + "§8 | §3CPU: " + "??%" + " §7(" + (System.currentTimeMillis() - now) + "ms)", packet.getPlayer());
+                ChatUtils.multicast("- main thread: §6TPS: " + LibertyCity.getInstance().getTPS() + "§8 | §3CPU: " + cpuUsage + "%" + " §7(" + (System.currentTimeMillis() - now) + "ms)", packet.getPlayer());
+                ChatUtils.multicast("- netty io thread: §6TPS: " + LibertyCity.getInstance().getTPS() + "§8 | §3CPU: " + ThreadMonitor.getThreadUsage(Thread.currentThread().getId()) + "%" + " §7(" + (System.currentTimeMillis() - now) + "ms)", packet.getPlayer());
                 //players thread
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).getProfileThread().execute(() -> ChatUtils.multicast("- " + player.getName() + "'s thread: " + "§6TPS: " + LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).tps + "§8 | §3CPU: " + ThreadMonitor.getThreadUsage(Thread.currentThread().getId()) + "%" + " §7(" + (System.currentTimeMillis() - now) + "ms)", packet.getPlayer()));
