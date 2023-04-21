@@ -10,12 +10,12 @@ import java.util.Map;
 
 public final class ThreadMonitor extends BukkitRunnable {
 
-    private static final ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
-    private static final RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
-    private static final Map<Long, Long> threadInitialCPU = new HashMap<>();
+    private final ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
+    private final RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+    private final Map<Long, Long> threadInitialCPU = new HashMap<>();
     private static final Map<Long, Float> threadCPUUsage = new HashMap<>();
-    private static final long initialUptime = runtimeMxBean.getUptime();
-    private static final OperatingSystemMXBean osMxBean = ManagementFactory.getOperatingSystemMXBean();
+    private final long initialUptime = runtimeMxBean.getUptime();
+    private final OperatingSystemMXBean osMxBean = ManagementFactory.getOperatingSystemMXBean();
     private ThreadInfo[] threadInfo;
 
     @Override
@@ -27,6 +27,36 @@ public final class ThreadMonitor extends BukkitRunnable {
         }
 
         Bukkit.getScheduler().runTaskLaterAsynchronously(LibertyCity.getInstance(), () -> {
+
+            /*
+
+            long upTime = runtimeMxBean.getUptime();
+            List<Long> threadCpuTime = new ArrayList<>();
+            for (long i = 0L; i < threadInitialCPU.size(); i++) {
+                long threadId = threadInitialCPU.get(i);
+                if (threadId != -1) {
+                    threadCpuTime.add(threadMxBean.getThreadCpuTime(threadId));
+                } else {
+                    threadCpuTime.add(0L);
+                }
+            }
+            int nCPUs = osMxBean.getAvailableProcessors();
+            if (initialUptime > 0L && upTime > initialUptime) {
+                cpuUsageList.clear();
+                // elapsedTime is in ms
+                long elapsedTime = upTime - initialUptime;
+                for (long i = 0L; i < threadInitialCPU.size(); i++) {
+                    // elapsedCpu is in ns
+                    long elapsedCpu = threadCpuTime.get((int) i) - threadInitialCPU.get(i);
+                    // cpuUsage could go higher than 100% because elapsedTime
+                    // and elapsedCpu are not fetched simultaneously. Limit to
+                    // 99% to avoid Chart showing a scale from 0% to 200%.
+                    float cpuUsage = Math.min(99F, elapsedCpu / (elapsedTime * 1000000F * nCPUs));
+                    cpuUsageList.set(Math.toIntExact(threadInitialCPU.get(i)), cpuUsage);
+                }
+            }
+
+            */
 
             long upTime = runtimeMxBean.getUptime();
 
@@ -47,17 +77,22 @@ public final class ThreadMonitor extends BukkitRunnable {
                 Long initialCPU = threadInitialCPU.get(info.getThreadId());
                 if (initialCPU != null) {
                     long elapsedCpu = threadCurrentCPU.get(info.getThreadId()) - initialCPU;
-                    float cpuUsage = elapsedCpu / (elapsedTime * 1000000F * nrCPUs);
+                    float cpuUsage = Math.min(99F, elapsedCpu / (elapsedTime * nrCPUs));
                     threadCPUUsage.put(info.getThreadId(), cpuUsage);
                 }
             }
-        }, 10*20);
+        }, 20*2);
 
         // threadCPUUsage contains cpu % per thread
         // You can use osMxBean.getThreadInfo(threadID) to get information on every thread reported in threadCPUUsage and analyze the most CPU intensive threads
     }
 
     public static float getThreadUsage(final long threadID) {
-        return threadCPUUsage.getOrDefault(threadID, -1f);
+        return threadCPUUsage.get(threadID);
+    }
+
+    public static long getThreadUpTime(final long threadID) {
+        final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+        return threadMXBean.getThreadCpuTime(threadID);
     }
 }

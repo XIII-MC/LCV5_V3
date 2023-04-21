@@ -86,7 +86,7 @@ public final class LibertyCity extends JavaPlugin {
         //Tasks
         log(Level.INFO, "Starting tasks...");
         new ClearLagTask(this).runTaskTimerAsynchronously(this, 20*1800, 20*1800);
-        new ThreadMonitor().runTaskTimerAsynchronously(this, 0L, 20*10);
+        new ThreadMonitor().runTaskTimerAsynchronously(this, 0L, 20*2);
         new LogExportTask().runTaskTimerAsynchronously(this, 20*5, 20*5);
 
         //Bukkit Listeners

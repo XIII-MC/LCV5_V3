@@ -33,10 +33,22 @@ public class ChatSystem implements Data {
         if (!packet.getEvent().isCancelled() && packet.getType() == PacketType.Play.Client.CHAT_MESSAGE && !packet.getChatWrapper().getMessage().startsWith("/")) {
 
             if (packet.getChatWrapper().getMessage().equalsIgnoreCase("threads")) {
-                LibertyCity.getInstance().getThread().execute(() -> ChatUtils.multicast("Performance recap across " + LibertyCity.getInstance().getThreadManager().getProfileThreads().size()+1 + " threads:" + "\n" + "- main thread TPS: " + LibertyCity.getInstance().getTPS() + " | " + "?%" + "\n" + "- server thread TPS: " + LibertyCity.getInstance().getServerProfile().tps + " | " + ThreadMonitor.getThreadUsage(Thread.currentThread().getId()) + "%", packet.getPlayer()));
+
+                ChatUtils.multicast("Performance recap across " + LibertyCity.getInstance().getThreadManager().getProfileThreads().size() + " threads:", packet.getPlayer());
+                final long now = System.currentTimeMillis();
+                //main thread
+                ChatUtils.multicast("- main thread: §6TPS: " + LibertyCity.getInstance().getTPS() + "§8 | §3CPU: " + "??%" + " §7(" + (System.currentTimeMillis() - now) + "ms)", packet.getPlayer());
+                //players thread
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).getProfileThread().execute(() -> ChatUtils.multicast("- " + player.getName() + "'s profile TPS: " + LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).tps + " | " + ThreadMonitor.getThreadUsage(Thread.currentThread().getId()) + "%", packet.getPlayer()));
+                    LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).getProfileThread().execute(() -> ChatUtils.multicast("- " + player.getName() + "'s thread: " + "§6TPS: " + LibertyCity.getInstance().getProfileManager().getProfile(player.getUniqueId()).tps + "§8 | §3CPU: " + ThreadMonitor.getThreadUsage(Thread.currentThread().getId()) + "%" + " §7(" + (System.currentTimeMillis() - now) + "ms)", packet.getPlayer()));
                 }
+                //server thread
+                LibertyCity.getInstance().getThread().execute(() -> ChatUtils.multicast("- server thread: §6TPS: " + LibertyCity.getInstance().getServerProfile().tps + "§8 | §3CPU: " + ThreadMonitor.getThreadUsage(Thread.currentThread().getId()) + "%" + " §7(" + (System.currentTimeMillis() - now) + "ms)", packet.getPlayer()));
+            }
+
+            if (packet.getChatWrapper().getMessage().equalsIgnoreCase("clear")) {
+                msgCache.clear();
+                return;
             }
 
             packet.getEvent().setCancelled(true);
@@ -80,7 +92,7 @@ public class ChatSystem implements Data {
             FileManager.log(getChatFormat());
 
             LibertyCity.getInstance().getThread().execute(() -> {
-                for (int i = 0; i < 999999; i++) {
+                for (int i = 0; i < 999; i++) {
                     msgCache.add(msgCache + getChatFormat());
                     cfg.set(String.valueOf(Math.random() * 293), msgCache);
                     try {
